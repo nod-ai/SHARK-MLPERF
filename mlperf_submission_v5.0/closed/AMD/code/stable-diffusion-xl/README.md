@@ -33,11 +33,6 @@ Preprocess data and prepare for run execution
 ```bash
 python3.11 preprocess_data.py
 
-# Compile the SHARK engines (MI325X)
-IREE_BUILD_MP_CONTEXT="fork" precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir
-
-# MI300x:
-IREE_BUILD_MP_CONTEXT="fork" precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_cpx_bs1.mlir
 ```
 
 ## Reproduce Results

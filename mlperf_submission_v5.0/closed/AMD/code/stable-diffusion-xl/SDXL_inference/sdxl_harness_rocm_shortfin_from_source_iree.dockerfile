@@ -41,7 +41,7 @@ SHELL ["/bin/bash", "-c"]
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 
 # Checkout and build IREE
-RUN git clone https://github.com/iree-org/iree.git -b users/krzysz00/buffer-experiments-copy-for-sdxl  \
+RUN git clone https://github.com/iree-org/iree.git -b shared/mlperf-v5.0-sdxl  \
   && cd iree \
   && git submodule update --init
 
@@ -67,7 +67,7 @@ ENV PYTHONPATH=/iree/build-release/runtime/bindings/python:/iree/build-release/c
 # Install shark-ai
 ######################################################
 
-RUN git clone https://github.com/nod-ai/shark-ai.git -b sdxl_exports \
+RUN git clone https://github.com/nod-ai/shark-ai.git -b shared/mlperf-v5.0-sdxl \
   && cd shark-ai \
   && python3.11 -m pip uninstall torch torchvision torchaudio -y \
   && python3.11 -m pip install https://download.pytorch.org/whl/nightly/pytorch_triton_rocm-3.0.0%2B21eae954ef-cp311-cp311-linux_x86_64.whl \

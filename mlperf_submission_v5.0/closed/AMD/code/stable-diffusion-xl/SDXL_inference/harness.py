@@ -240,6 +240,12 @@ def get_args():
         default=True,
         help="Find best matching CPU-GPU pairs based on the NUMA.",
     )
+    parser.add_argument(
+        "--enable_batcher",
+        type=str2bool,
+        default=False,
+        help="Batch requests in server mode for gpu_batch_size>1.",
+    )
 
     parser.add_argument(
         "--shark_engine",
@@ -353,8 +359,8 @@ def mlperf(args):
         dataset=Dataset(args.tensor_path),
         gpu_batch_size=args.gpu_batch_size,
         verbose=args.verbose,
-        enable_batcher=False,
-        batch_timeout_threashold=-1,
+        enable_batcher=args.enable_batcher,
+        batch_timeout_threashold=3 if args.enable_batcher else -1,
         cores_per_devices=args.cores_per_devices,
         save_images=args.save_images,
         performance_sample_count=args.performance_sample_count,

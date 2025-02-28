@@ -139,7 +139,7 @@ class SDXLShortfinService:
                     f"Server process job init started for {device_id}:{core_id} device"
                 )
                 if use_response_pipes:
-                    self.response_pipes.append(queue.SimpleQueue())
+                    self.response_pipes.append(JoinableQueue())
 
                 # TODO: Refactor to nicer solution
                 implementation = SharkMicroShortfinProcessSamples
@@ -154,7 +154,7 @@ class SDXLShortfinService:
                     core_id=core_id,
                     init_queue=self.init_queue,
                     sample_queue=self.sample_queue,
-                    response_comm=self.response_queue,
+                    response_comm=self.response_queue if not self.use_response_pipes else self.response_pipes[-1],
                     model_weights=model_weights,
                     gpu_batch_size=self.gpu_batch_size,
                     verbose=self.verbose,
@@ -204,7 +204,7 @@ class SDXLShortfinService:
                 target=self.process_response_loop,
                 args=(
                     (
-                        self.response_pipes[idx][0]
+                        self.response_pipes[idx]
                         if self.use_response_pipes
                         else self.response_queue
                     ),
@@ -403,7 +403,7 @@ class SDXLShortfinService:
         self.sample_queue.join()
         if self.use_response_pipes:
             for pipe in self.response_pipes:
-                pipe[1].put(None)
+                pipe.put(None)
         else:
             for _ in self.response_jobs:
                 self.response_queue.put(None)

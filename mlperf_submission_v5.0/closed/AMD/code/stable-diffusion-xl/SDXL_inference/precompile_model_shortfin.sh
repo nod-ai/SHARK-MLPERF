@@ -2,7 +2,7 @@
 
 # Function to display usage
 usage() {
-    echo "Usage: $0 [--model_weights <path>] [--model_json <file>] [--flag_file <file>] [--td_spec <file>] [--force_export <True|False>] [--gpu_batch_size <int>] [--vae_batch_size <int>]"
+    echo "Usage: $0 [--model_weights <path>] [--model_json <file>] [--flag_file <file>] [--td_spec <file>] [--force_export <True|False>] [--gpu_batch_size <int>] [--vae_batch_size <int>] [--quant_path <path>]"
     exit 1
 }
 
@@ -10,10 +10,11 @@ usage() {
 model_weights="/models/SDXL/official_pytorch/fp16/stable_diffusion_fp16"
 model_json="sdxl_config_fp8_sched_unet.json"
 flag_file="sdxl_flagfile_gfx942.txt"
-td_spec=""
+td_spec="attention_and_matmul_spec_MI325.mlir"
 force_export=false
 gpu_batch_size=""
 vae_batch_size=""
+quant_path="/models/SDXL/official_pytorch/fp16/stable_diffusion_fp16/safetensors_quant"
 
 # Parse arguments
 while [[ "$#" -gt 0 ]]; do
@@ -32,6 +33,8 @@ while [[ "$#" -gt 0 ]]; do
             gpu_batch_size="$2"; shift 2;;
         --vae_batch_size)
             vae_batch_size="$2"; shift 2;;
+        --quant_path)
+            quant_path="$2"; shift 2;;
         *)
             usage;;
     esac
@@ -46,19 +49,19 @@ if [[ -n "$td_spec" ]]; then
 fi
 shortfin_dir="/shark-ai/shortfin/python/shortfin_apps/sd"
 
-if [[ -n "$gpu_batch_size" ]]; then
-    # Modify JSON batch sizes
-    sed -i -E "s/\"clip\": \[[0-9]+\]/\"clip\": [$gpu_batch_size]/g; \
-            s/\"scheduled_unet\": \[[0-9]+\]/\"scheduled_unet\": [$gpu_batch_size]/g; \
-            s/\"vae\": \[[0-9]+\]/\"vae\": [${vae_batch_size:-$gpu_batch_size}]/g" "$script_path"
-fi
+# Modify JSON batch sizes
+sed -i -E "s/\"clip\": \[[0-9]+\]/\"clip\": [$gpu_batch_size]/g; \
+           s/\"scheduled_unet\": \[[0-9]+\]/\"scheduled_unet\": [$gpu_batch_size]/g; \
+           s/\"vae\": \[[0-9]+\]/\"vae\": [${vae_batch_size:-$gpu_batch_size}]/g" "$script_path"
 
 # Parse model_flags from flag file
+current_model="all"
 declare -A model_flags
 model_flags["all"]=""
+
 while IFS= read -r line; do
     if [[ "$line" == --* ]]; then
-        model_flags["all"]+="$line "
+        model_flags["$current_model"]+="$line "
     else
         current_model="$line"
         model_flags["$current_model"]=""
@@ -67,7 +70,8 @@ done < "$flagfile"
 
 # Append td_spec if provided
 if [[ -n "$td_spec" ]]; then
-    for key in "unet" "punet" "scheduled_unet"; do
+    echo "Applying TD spec"
+        for key in "unet" "punet" "scheduled_unet"; do
         if [[ -n "${model_flags[$key]}" ]]; then
             model_flags[$key]+=" --iree-codegen-transform-dialect-library=$td_spec"
         fi
@@ -95,6 +99,7 @@ for modelname in "clip" "scheduled_unet" "vae"; do
         "--iree-hal-target-device=amdgpu"
         "--iree-hip-target=gfx942"
         "--iree-compile-extra-args=$ireec_extra_args"
+        "--quant-path=$quant_path"
     )
     
     echo "Executing: ${builder_args[*]}"

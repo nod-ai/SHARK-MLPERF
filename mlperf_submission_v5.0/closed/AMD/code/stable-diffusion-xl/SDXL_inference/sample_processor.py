@@ -5,6 +5,8 @@ import asyncio
 import multiprocessing as mp
 import multiprocessing.queues
 import os
+import signal
+
 import time
 
 from multiprocessing import JoinableQueue, Process
@@ -205,6 +207,20 @@ class SampleProcessor(Process):
             self.send_response = self.response_comm.send
         else:
             raise RuntimeError(f"Unsupported response comm {type(self.response_comm)}")
+
+        def signal_handler(sig, frame):
+            print(f'Sample Processor {self.pid} received signal {sig}')
+            # Perform cleanup actions here, if needed
+            if self.service is not None:
+                self.sysman.shutdown()
+                self.service.shutdown()
+            if self.implementation is not None:
+                del self.implementation
+            gc.collect()
+
+            sys.exit(0)
+
+        signal.signal(signal.SIGTERM, signal_handler)
 
     @rpd_trace()
     def init_processor(self):
