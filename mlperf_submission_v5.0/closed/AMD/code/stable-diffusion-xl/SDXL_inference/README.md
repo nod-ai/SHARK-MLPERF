@@ -18,7 +18,7 @@ NOTE: the arguments below are informed by the best current parameter search valu
 
 ```bash
 # Run Offline scenario (Perf)
-ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3 harness.py \
+ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.11 harness.py \
   --devices "$DEVICES" \
   --gpu_batch_size 2 \
   --cores_per_devices 2 \
@@ -37,7 +37,7 @@ ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3 harness.py \
 Accuracy checks require execution of a separate run
 ```bash
 # Run Offline scenario (Accuracy)
-ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3 harness.py \
+ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.11 harness.py \
   --devices $DEVICES" \
   --gpu_batch_size 2 \
   --cores_per_devices 2 \
