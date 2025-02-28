@@ -9,14 +9,7 @@ python3 harness.py --devices <list the devices> --scenario Offline # e.g. --devi
 # Use "--save_images" to save the generated image into ./harness_result_shark
 
 # configure to run in CPX mode (64 gpus)
-export ROCR_VISIBLE_DEVICES=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63
-export HIP_VISIBLE_DEVICES=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63
-
-# Alternative example: 2-GPU configuration, using the last two devices
-export ROCR_VISIBLE_DEVICES=6,7
-export HIP_VISIBLE_DEVICES=0,1
-
-python3 precompile_models.py --batch_sizes "1"
+export DEVICES=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63
 ```
 
 ## Run inference
@@ -25,54 +18,39 @@ NOTE: the arguments below are informed by the best current parameter search valu
 
 ```bash
 # Run Offline scenario (Perf)
-python3 harness.py \
-  --devices "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63" \
-  --gpu_batch_size 1 \
+ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3 harness.py \
+  --devices $DEVICES" \
+  --gpu_batch_size 2 \
   --cores_per_devices 2 \
-  --qps 12  \
+  --count 51200 \
+  --qps 16  \
+  --fibers_per_device 1 \
+  --test_mode PerformanceOnly \
   --scenario Offline \
+  --vae_batch_size 1 \
+  --td_spec=attention_and_matmul_spec_gfx942_MI325.mlir \
+  --model_json=sdxl_config_fp8_sched_unet.json \
   --logfile_outdir output_offline_perf
-
-# Run Server scenario, PerformanceOnly, 8 GPUs
-python3 harness.py \
-  --devices "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63" \
-  --gpu_batch_size 1 \
-  --cores_per_devices 2 \
-  --qps 12  \
-  --scenario Server \
-  --logfile_outdir output_server_perf
-
-# Method to run a smaller test 
-# Smaller batch sizes can be specified with `--gpu_batch_size <num>`, providing the model was 
-# built with that batch size
-# `--infer_timeout` is in seconds
-python3 infer.py --devices "0" --save_images 1 --infer_timeout 20 --verbose 1 --gpu_batch_size 4
-
-# There should be 10 images, check them manually
-ls harness_result_shark/
 ```
 
 ## Check Accuracy
 Accuracy checks require execution of a separate run
 ```bash
 # Run Offline scenario (Accuracy)
-python3 harness.py \
-  --devices "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63" \
-  --gpu_batch_size 1 \
+ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3 harness.py \
+  --devices $DEVICES" \
+  --gpu_batch_size 2 \
   --cores_per_devices 2 \
-  --scenario Offline \
+  --fibers_per_device 1 \
+  --count 5000 \
+  --qps 16  \
   --test_mode AccuracyOnly \
+  --scenario Offline \
+  --vae_batch_size 1 \
+  --td_spec=attention_and_matmul_spec_gfx942_MI325.mlir \
+  --model_json=sdxl_config_fp8_sched_unet.json \
   --logfile_outdir output_offline_acc
 
-# Run Server scenario (Accuracy)
-python3 harness.py \
-  --devices "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63" \
-  --gpu_batch_size 1 \
-  --cores_per_devices 2 \
-  --scenario Server \
-  --test_mode AccuracyOnly \
-  --logfile_outdir output_server_acc
-```
 The `--test_mode AccuracyOnly` run will create a <output_dir>/accuracy.json. (It should be ~30Gb)
 
 Next, create the environment with dependencies
