@@ -17,13 +17,15 @@ NOTE: the arguments below are informed by the best current parameter search valu
 
 
 ```bash
+IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --gpu_batch_size 1 --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_all.json
+
 # Run Offline scenario (Perf)
 ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.11 harness.py \
   --devices "$DEVICES" \
-  --gpu_batch_size 2 \
-  --cores_per_devices 2 \
+  --gpu_batch_size 16 \
+  --cores_per_devices 1 \
   --count 51200 \
-  --qps 16  \
+  --qps 17  \
   --fibers_per_device 1 \
   --test_mode PerformanceOnly \
   --scenario Offline \
@@ -39,11 +41,11 @@ Accuracy checks require execution of a separate run
 # Run Offline scenario (Accuracy)
 ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.11 harness.py \
   --devices $DEVICES" \
-  --gpu_batch_size 2 \
-  --cores_per_devices 2 \
+  --gpu_batch_size 16 \
+  --cores_per_devices 1 \
   --fibers_per_device 1 \
   --count 5000 \
-  --qps 16  \
+  --qps 17  \
   --test_mode AccuracyOnly \
   --scenario Offline \
   --vae_batch_size 1 \
