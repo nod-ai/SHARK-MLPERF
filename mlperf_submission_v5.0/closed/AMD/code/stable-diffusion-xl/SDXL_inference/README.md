@@ -2,11 +2,11 @@
 The following documentation describes additional options for run execution and profiling of SDXL. This documentation assumes users have completed all steps within [AMD MI300X SDXL](../README.md), up to the point of [Reproduce Results](../README.md#reproduce-results), and starts from a position _within_ the running Inference Docker Container.
 
 ## Inference options
+You can find the code for our SHARK inference stack which this project is built on here - https://github.com/nod-ai/shark-ai/tree/main/shortfin/python/shortfin_apps/sd
 
 ```bash
 # Basic run template
-python3 harness.py --devices <list the devices> --scenario Offline # e.g. --devices "6,7"
-# Use "--save_images" to save the generated image into ./harness_result_shark
+python3 harness.py --devices <list the devices> --scenario Offline
 
 # configure to run in CPX mode (64 gpus)
 export DEVICES=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63
@@ -19,7 +19,7 @@ NOTE: the arguments below are informed by the best current parameter search valu
 ```bash
 # Run Offline scenario (Perf)
 ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3 harness.py \
-  --devices $DEVICES" \
+  --devices "$DEVICES" \
   --gpu_batch_size 2 \
   --cores_per_devices 2 \
   --count 51200 \
