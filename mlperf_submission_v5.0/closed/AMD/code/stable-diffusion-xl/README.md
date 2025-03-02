@@ -75,8 +75,10 @@ Preprocess data and prepare for run execution
 python3.11 preprocess_data.py
 
 # Compile the SHARK engines
-./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir
+./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_all.json
 ```
+The above precompile command will compile inference execution artifacts for all the batch sizes used in the official submission. (1, 2, 16)
+If you have any questions or issues with this step, please file an issue on [nod-ai/SHARK-MLPERF](https://github.com/nod-ai/SHARK-MLPERF).
 
 ## Reproduce Results
 Run the two commands below in an inference container to reproduce full submission results.
