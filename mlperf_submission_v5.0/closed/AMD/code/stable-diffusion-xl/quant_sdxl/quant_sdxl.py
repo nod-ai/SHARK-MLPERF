@@ -173,16 +173,10 @@ def main(args):
     # Extract list of layers to avoid
     blacklist = []
     non_blacklist = dict()
+    blacklist = []
     for name, module in pipe.unet.named_modules():
-        suffix = name.split('.')[-1]
         if any(map(lambda x: x in name, ['time_emb', 'conv_in', 'conv_out', 'add_embedding'])):
-            blacklist.append(suffix)
-        else:
-            if isinstance(module, (torch.nn.Linear, torch.nn.Conv2d)) and suffix not in blacklist:
-                if suffix not in non_blacklist:
-                    non_blacklist[suffix] = 1
-                else:
-                    non_blacklist[suffix] +=1
+            blacklist.append(name)
     print(f"Blacklisted layers: {set(blacklist)}")
 
     # Make sure there all LoRA layers are fused first, otherwise raise an error
@@ -268,6 +262,7 @@ def main(args):
             print(f"Loading checkpoint: {args.load_checkpoint}... ", end="")
             sd = torch.load(args.load_checkpoint)
             pipe.unet.load_state_dict(sd)
+            pipe.unet.eval()
             print(f"Checkpoint loaded!")
             config.IGNORE_MISSING_KEYS = False
         pipe = pipe.to(args.device)
