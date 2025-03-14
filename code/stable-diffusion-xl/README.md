@@ -135,7 +135,15 @@ IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_
 ./run_scenario_server_MI325x_cpx.sh
 ```
 
-Finally, run the following script to generate accuracy scores
+### Troubleshooting
+
+When you see error
 ```bash
-./check_accuracy_scores.sh <output_dir>/mlperf_log_accuracy.json
+ValueError: shortfin_iree-src/runtime/src/iree/io/parameter_index.c:237: NOT_FOUND; no parameter found in index with key 'down_blocks.1.attentions.0.transformer_blocks.0.attn1.out_q:rscale'
 ```
+Please execute command
+```bash
+rm /models/SDXL/official_pytorch/fp16/stable_diffusion_fp16/genfiles/sdxl/stable_diffusion_xl_base_1_0_punet_dataset_i8.irpa
+```
+Then re-run the harness.py
+
