@@ -1,10 +1,34 @@
-# AMD MI300X SDXL
+# AMD MI300X/MI325X SDXL
 
 ## Machine setup
-[Setup Mi3xx machine and change to CPX/QPX/SPX modes](https://github.com/nod-ai/playbook/blob/main/HOWTO/Setup/mi3xx.md)
-## Setup
+1. Install latest public build of ROCM:
 
-### Quantization (Optional)
+Follow the official instructions for installing rocm6.3.3: [amdgpu-install](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/install/install-methods/amdgpu-installer-index.html) or [package manager](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/install/install-methods/package-manager-index.html)
+
+2. If you run into any issue, follow the official instructions for uninstalling in the above links, and try again.
+
+3. Run following to see all the 64 devices in CPX mode
+```
+echo 'blacklist ast' | sudo tee /etc/modprobe.d/blacklist-ast.conf
+sudo update-initramfs -u -k $(uname -r)
+```
+4. run: 'sudo reboot'
+5. Once machine comes back up, you can run the following to make sure you have the right compute/memory partitioning:
+MI325x:
+```
+sudo rocm-smi --setmemorypartition NPS1
+sudo rocm-smi --setcomputepartition CPX 
+```
+MI300x:
+```
+sudo rocm-smi --setmemorypartition NPS4
+sudo rocm-smi --setcomputepartition CPX 
+```
+8. run 'rocm-smi' to check your mode
+
+## Submission Setup
+
+### Quantization
 NOTE: Running quantization will require 2 or more hours (on GPU) to complete, and much longer on CPU. As a matter of convenience, the weights that result from this quantization are also available from [huggingface](https://huggingface.co/amd-shark/sdxl-quant-models). To skip quantization and work from downloaded weights, please jump to the [AMD MLPerf Inference Docker Container Setup](#amd-mlperf-inference-docker-container-setup) section.
 
 Create the container that will be used for dataset preparation and model quantization
@@ -42,9 +66,9 @@ exit
 ```
 
 ### AMD MLPerf Inference Docker Container Setup
+
+From `code/stable-diffusion-xl/`:
 ```bash
-# TODO update this
-cd 2024q2-sdxl-mlperf-sprint
 
 # Build the container
 docker build --platform linux/amd64 \
@@ -74,26 +98,41 @@ Preprocess data and prepare for run execution
 ```bash
 python3.11 preprocess_data.py
 
-# Compile the SHARK engines
-./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_all.json
+# Process local checkpoint generated from quantization docker
+python3.11 process_quant.py
 ```
-The above precompile command will compile inference execution artifacts for all the batch sizes used in the official submission. (1, 2, 16)
-If you have any questions or issues with this step, please file an issue on [nod-ai/SHARK-MLPERF](https://github.com/nod-ai/SHARK-MLPERF).
 
 ## Reproduce Results
-Run the two commands below in an inference container to reproduce full submission results.
+Run the commands below in an inference container to reproduce full submission results.
+Each submission run command is preceded by a specific precompilation command. If you encounter issues with the precompilation, please file an issue at [shark-ai/issues](https://github.com/nod-ai/shark-ai/issues)
 The commands will execute performance, accuracy, and compliance tests for Offline and Server scenarios.
 
 NOTE: additional run commands and profiling options are described in [SDXL Inference](./SDXL_inference/README.md) documentation.
 ``` bash
 # MI300x
+
+# Compile the SHARK engines (Offline)
+IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_bs2.json
+# Run the offline scenario.
 ./run_scenario_offline_MI300x_cpx.sh
+
+# Compile the SHARK engines (Server)
+IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_bs1.json
+# Run the server scenario.
 ./run_scenario_server_MI300x_cpx.sh
 ```
 ``` bash
 # MI325x
-./run_scenario_offline_MI325x_cpx.sh
-./run_scenario_server_MI325x_cpx.sh
+
+# Compile the SHARK engines (Offline)
+IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_bs16.json
+# Run the offline scenario.
+./run_scenario_offline_MI300x_cpx.sh
+
+# Compile the SHARK engines (Server)
+IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_bs2.json
+# Run the server scenario.
+./run_scenario_server_MI300x_cpx.sh
 ```
 
 ### Execute individual scenario tests
@@ -136,15 +175,3 @@ Finally, run the following script to generate accuracy scores
 ```bash
 ./check_accuracy_scores.sh <output_dir>/mlperf_log_accuracy.json
 ```
-
-### Troubleshooting
-
-When you see error
-```bash
-ValueError: shortfin_iree-src/runtime/src/iree/io/parameter_index.c:237: NOT_FOUND; no parameter found in index with key 'down_blocks.1.attentions.0.transformer_blocks.0.attn1.out_q:rscale'
-```
-Please execute command
-```bash
-rm /models/SDXL/official_pytorch/fp16/stable_diffusion_fp16/genfiles/sdxl/stable_diffusion_xl_base_1_0_punet_dataset_i8.irpa
-```
-Then re-run the harness.py
