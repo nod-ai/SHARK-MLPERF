@@ -3,10 +3,10 @@
     "num_latents_channels": 4,
     "batch_sizes": {
         "clip": [
-            1, 2, 16
+            16
         ],
         "scheduled_unet": [
-            1, 2, 16
+            16
         ],
         "vae": [
             1
