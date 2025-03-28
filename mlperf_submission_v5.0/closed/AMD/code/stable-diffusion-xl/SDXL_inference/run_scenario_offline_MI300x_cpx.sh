@@ -13,8 +13,6 @@ SYSTEM_CONFIG_ID="8xMI300x_2xEPYC-9454"
 OUTPUT_ROOT=$RESULT_DIR/closed/AMD
 DEVICES="0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63"
 
-IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --gpu_batch_size 1 --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_all.json
-
 function run_scenario {
 	# cleanup audit.config just in case
 	if test -f "audit.config"; then
@@ -48,7 +46,6 @@ function run_scenario {
 		--cores_per_devices $CPD \
 		--fibers_per_device $FPD \
 		--scenario ${SCENARIO} \
-		--count 5000 \
 		--test_mode AccuracyOnly \
 		--logfile_outdir ${RESULTS_ROOT}/${SCENARIO}/accuracy \
   		--vae_batch_size 1 \

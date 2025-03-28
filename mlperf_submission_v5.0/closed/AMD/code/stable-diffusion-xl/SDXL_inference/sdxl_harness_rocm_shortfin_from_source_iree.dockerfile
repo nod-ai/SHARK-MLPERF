@@ -41,7 +41,7 @@ SHELL ["/bin/bash", "-c"]
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 
 # Checkout and build IREE
-RUN git clone https://github.com/iree-org/iree.git -b shared/mlperf-v5.0-sdxl  \
+RUN git clone https://github.com/iree-org/iree.git -b users/krzysz00/buffer-experiments-copy-for-sdxl  \
   && cd iree \
   && git submodule update --init
 

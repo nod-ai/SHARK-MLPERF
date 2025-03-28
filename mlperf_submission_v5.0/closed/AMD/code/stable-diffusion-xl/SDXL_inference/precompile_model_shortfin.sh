@@ -10,7 +10,7 @@ usage() {
 model_weights="/models/SDXL/official_pytorch/fp16/stable_diffusion_fp16"
 model_json="sdxl_config_fp8_sched_unet.json"
 flag_file="sdxl_flagfile_gfx942.txt"
-td_spec="attention_and_matmul_spec_MI325.mlir"
+td_spec="attention_and_matmul_spec_gfx942_MI325.mlir"
 force_export=false
 gpu_batch_size=""
 vae_batch_size=""
@@ -48,6 +48,7 @@ if [[ -n "$td_spec" ]]; then
     td_spec="$script_dir/$td_spec"
 fi
 shortfin_dir="/shark-ai/shortfin/python/shortfin_apps/sd"
+export IREE_BUILD_MP_CONTEXT="fork"
 
 # Modify JSON batch sizes
 sed -i -E "s/\"clip\": \[[0-9]+\]/\"clip\": [$gpu_batch_size]/g; \
@@ -71,7 +72,7 @@ done < "$flagfile"
 # Append td_spec if provided
 if [[ -n "$td_spec" ]]; then
     echo "Applying TD spec"
-        for key in "unet" "punet" "scheduled_unet"; do
+        for key in "unet" "punet" "scheduled_unet" "vae"; do
         if [[ -n "${model_flags[$key]}" ]]; then
             model_flags[$key]+=" --iree-codegen-transform-dialect-library=$td_spec"
         fi
@@ -95,6 +96,8 @@ for modelname in "clip" "scheduled_unet" "vae"; do
         "--build-preference=export"
         "--output-dir=$model_weights"
         "--model=$modelname"
+        "--model-weights-path=$model_weights/checkpoint_pipe"
+        "--scheduler-config-path=$model_weights/checkpoint_scheduler"
         "--force-update=$force_export"
         "--iree-hal-target-device=amdgpu"
         "--iree-hip-target=gfx942"
