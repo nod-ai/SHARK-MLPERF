@@ -34,7 +34,7 @@ function run_scenario {
   		--vae_batch_size 1 \
 		--enable_batcher True \
 		--td_spec=attention_and_matmul_spec_gfx942_MI325.mlir \
-		--model_json=sdxl_config_fp8_sched_unet.json
+		--model_json=sdxl_config_fp8_sched_unet_bs2.json
 
 	echo "Finished performance test."
 	echo "Run $SCENARIO accuracy test"
@@ -51,7 +51,7 @@ function run_scenario {
 		--logfile_outdir ${RESULTS_ROOT}/${SCENARIO}/accuracy \
   		--vae_batch_size 1 \
 		--td_spec=attention_and_matmul_spec_gfx942_MI325.mlir \
-		--model_json=sdxl_config_fp8_sched_unet.json 
+		--model_json=sdxl_config_fp8_sched_unet_bs2.json 
 
 	echo "Finished accuracy test."
 
@@ -91,7 +91,7 @@ function run_compliance_test {
 		--enable_batcher True \
   		--vae_batch_size 1 \
 		--td_spec=attention_and_matmul_spec_gfx942_MI325.mlir \
-		--model_json=sdxl_config_fp8_sched_unet.json 
+		--model_json=sdxl_config_fp8_sched_unet_bs2.json 
 	rm audit.config
 }
 function copy_audit
