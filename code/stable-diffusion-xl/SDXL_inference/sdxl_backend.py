@@ -5,18 +5,13 @@ import time
 import numpy as np
 import array
 import os
-import requests
-import subprocess
 import sys
-import queue
 import socket
 import signal
 
 import multiprocessing.queues
 
 from multiprocessing import JoinableQueue
-
-from transformers import CLIPTokenizer
 
 try:
     import mlperf_loadgen as lg
@@ -33,8 +28,7 @@ from sample_processor import SampleRequest, SampleProcessor
 
 # from shortfin_process_samples import ShortfinProcessSamples
 from mock_process_samples import MockProcessSamples
-from utilities import rpd_trace
-from shortfin_apps.sd.python_pipe import *
+from utilities import rpd_trace, find_modules
 from shortfin_apps.sd.components.config_struct import ModelParams
 
 
@@ -236,15 +230,11 @@ class SDXLShortfinService:
             os.path.join(script_dir, self.td_spec) if self.td_spec is not None else None
         )
         model_params = ModelParams.load_json(script_path)
-        vmfbs, params = get_modules(
+        vmfbs, params = find_modules(
             target="gfx942",
             device="amdgpu",
             model_config=script_path,
             artifacts_dir=self.model_weights,
-            force_update=self.force_export,
-            flagfile=flagfile,
-            td_spec=td_spec,
-            build_preference="export",
         )
         return None, vmfbs, params
 

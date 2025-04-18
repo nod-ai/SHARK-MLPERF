@@ -1,39 +1,22 @@
 from concurrent.futures import ALL_COMPLETED, ThreadPoolExecutor
-import concurrent.futures as futures
 import gc
 import asyncio
 import multiprocessing as mp
 import multiprocessing.queues
 import os
 import signal
+import sys
 
-import time
+from multiprocessing import Process
 
-from multiprocessing import JoinableQueue, Process
-
-import queue
 import numa_helpers
-import shortfin.array as sfnp
 
 from shortfin_apps.sd.components.config_struct import ModelParams
-from shortfin_apps.sd.components.generate import GenerateImageProcess
-from shortfin_apps.sd.components.io_struct import GenerateReqInput
 from shortfin_apps.sd.components.manager import SystemManager
-from shortfin_apps.sd.components.messages import InferenceExecRequest, InferencePhase
-from shortfin_apps.sd.components.service import (
-    GenerateService,
-    InferenceExecutorProcess,
-)
+from shortfin_apps.sd.components.service import GenerateService
 from shortfin_apps.sd.components.tokenizer import Tokenizer
 
-from shortfin_apps.sd.python_pipe import *
-from transformers import CLIPTokenizer
-from utilities import CONFIG, ArgHolder, rpd_trace, gen_input_ids
-
-from threading import Thread
-
-import time
-import random
+from utilities import CONFIG, rpd_trace, gen_input_ids
 
 
 def create_service(

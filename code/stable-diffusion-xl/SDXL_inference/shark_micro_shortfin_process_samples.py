@@ -1,30 +1,15 @@
 import concurrent.futures
-from concurrent.futures import ThreadPoolExecutor
-import copy
-import os
-from sys import exec_prefix
 import numpy as np
 import asyncio
 
 from base_process_samples import BaseProcessSamples
-from pathlib import Path
-from preprocess_data import prepare_tokenizer, encode_prompts
-from sample_processor import SampleRequest, SampleResponse
-from utilities import CONFIG, rpd_trace, ArgHolder, gen_input_ids, sample_request
-from PIL import Image
+from sample_processor import SampleRequest
+from utilities import CONFIG, rpd_trace, ArgHolder, gen_input_ids
 
-import shortfin.array as sfnp
 import shortfin as sf
 
-import time
-
-from shortfin_apps.sd.python_pipe import create_service
 from shortfin_apps.sd.components.messages import InferencePhase, InferenceExecRequest
-from shortfin_apps.sd.components.service import (
-    InferenceExecutorProcess,
-)
-
-from threading import Lock
+from shortfin_apps.sd.components.service import InferenceExecutorProcess
 
 class MicroSDXLHarnessExecutor:
 
@@ -41,7 +26,6 @@ class MicroSDXLHarnessExecutor:
 
         runner = Runner(self.args, self.service, self.fiber_idx, self.logger)
         await asyncio.gather(runner.launch())
-        # self.imgs = runner.imgs
         return runner.imgs
 
 
@@ -93,7 +77,6 @@ class Runner(sf.Process):
 class SharkMicroShortfinProcessSamples(BaseProcessSamples):
 
     def __init__(self, service, init_noise_latent):
-        self.service = None
         self.num_exec_procs = 1
         self.imgs = []
         self.procs = []
@@ -117,59 +100,10 @@ class SharkMicroShortfinProcessSamples(BaseProcessSamples):
         verbose_log,
     ):
         pass
-        # verbose_log(f"Initializing with pid {os.getpid()}")
-        # try:
-        #     # Note: These moved here deliberately, so we should fail even when we are not printing them
-        #     rocr_devs = os.environ["ROCR_VISIBLE_DEVICES"]
-        #     hip_devs = os.environ["ROCR_VISIBLE_DEVICES"]
-        #     verbose_log(
-        #         f"ROCR_VISIBLE_DEVICES={rocr_devs} HIP_VISIBLE_DEVICES={hip_devs}"
-        #     )
-        # except KeyError:
-        #     init_queue.put((-1, device_id, core_id))
-        #     raise RuntimeError(
-        #         f"[Device {device_id}:{core_id}] Please set 'ROCR_VISIBLE_DEVICES' and 'HIP_VISIBLE_DEVICES' envs"
-        #     )
-        # try:
-        #     init_noise_latent = init_noise_latent.astype(np.float16)
-        # except RuntimeError:
-        #     init_queue.put((-1, device_id, core_id))
-        #     raise
-        # return
 
     @rpd_trace()
     def start_service(self, model_config, vmfbs, params, noise, device_idx=None):
         pass
-        # model_params, tokenizers, vmfbs, params = self.prepare_service()
-        # fibers_per_device = 1
-        # isolation = "per_fiber"
-        # trace_execution = False
-        #
-        # service = create_service(
-        #     model_params=model_config,
-        #     device="amdgpu",
-        #     tokenizers=[],
-        #     vmfbs=vmfbs,
-        #     params=params,
-        #     device_idx=0,
-        #     device_ids=[],
-        #     fibers_per_device=fibers_per_device,
-        #     isolation=isolation,
-        #     trace_execution=trace_execution,
-        # )
-        # self.init_noise_latent = []
-        # for _ in range(self.num_exec_procs):
-        #     # NOTE: This assumes each service knows one device! Otherwise, we need a mapping of init latents to fibers explicitly.
-        #     latent_dev = sfnp.device_array.for_device(
-        #         service.meta_fibers[0].device(0), noise.shape, model_config.unet_dtype
-        #     )
-        #     sample_host = latent_dev.for_transfer()
-        #     with sample_host.map(discard=True) as m:
-        #         m.fill(noise)
-
-        #     latent_dev.copy_from(sample_host)
-        #     self.init_noise_latent = latent_dev
-        # return service
 
     @rpd_trace()
     def warmup(
@@ -183,8 +117,6 @@ class SharkMicroShortfinProcessSamples(BaseProcessSamples):
         batch_size=1,
         url=None,
     ):
-        # pass
-        # # self.service.load_infere
         tokenizers = service.tokenizers
         synthetic_strs = [
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit",
