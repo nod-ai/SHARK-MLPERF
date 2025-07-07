@@ -15,8 +15,6 @@ jobs:
     name: "Start Container"
     runs-on: linux-mi300-8gpu-ossci-nod-ai
     steps:
-      - name: Pre Checkout MI300 Step
-        run: sudo chmod -R 777 ~/actions-runner/_work
       - name: Increase system vm map
         run: sudo sysctl -w vm.max_map_count=262144
       - name: Increase static TLS block limit
