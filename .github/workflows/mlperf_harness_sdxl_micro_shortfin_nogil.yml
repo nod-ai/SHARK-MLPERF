@@ -27,7 +27,6 @@ jobs:
       # so the actual testing job can use it using docker exec
       - name: Build and run Docker
         run: |
-          echo "always" | sudo tee /sys/kernel/mm/transparent_hugepage/enabled
           cd code/stable-diffusion-xl
           docker build --no-cache --platform linux/amd64 \
             --tag mlperf_rocm_sdxl:ci_micro_shortfin_nogil_${{ github.run_number }} \
