@@ -45,7 +45,7 @@ RUN pip install pybind11 'nanobind<2' pandas
 
 # install loadgen
 RUN mkdir /mlperf/ && cd /mlperf && \
-    git clone --recursive https://github.com/jinchen62/inference.git -b gil_free_shortfin && \
+    git clone --recursive https://github.com/jinchen62/inference.git -b fix_nogil_build && \
     cd inference/loadgen && \
     mkdir -p /mlperf/harness/ && \
     CFLAGS="-std=c++14" python setup.py install
