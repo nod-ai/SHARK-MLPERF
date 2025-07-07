@@ -44,7 +44,7 @@ jobs:
   ml_perf_test:
     needs: start_container
     name: "ML Perf Harness Test"
-    runs-on: nodai-amdgpu-mi300-x86-64-perf
+    runs-on: linux-mi300-8gpu-ossci-nod-ai
     steps:
       - name: Print Hashes of Dependencies
         run: |
@@ -109,7 +109,7 @@ jobs:
     needs: ml_perf_test
     name: "Docker Cleanup"
     if: always()
-    runs-on: nodai-amdgpu-mi300-x86-64-perf
+    runs-on: linux-mi300-8gpu-ossci-nod-ai
     steps:
       - name: Cleanup Docker
         run: |
