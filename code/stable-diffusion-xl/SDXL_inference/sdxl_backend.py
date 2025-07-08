@@ -161,6 +161,7 @@ class SDXLShortfinService:
                     fibers_per_device=fibers_per_device,
                     workers_per_device=workers_per_device,
                     num_sample_loops=num_sample_loops,
+                    model_json=self.model_json,
                     log_sample_gets=log_sample_get,
                     debug=debug
                 )
