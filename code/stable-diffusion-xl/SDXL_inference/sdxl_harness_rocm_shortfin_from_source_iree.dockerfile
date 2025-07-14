@@ -41,9 +41,9 @@ SHELL ["/bin/bash", "-c"]
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 
 # Checkout and build IREE
-RUN git clone https://github.com/iree-org/iree.git  \
-  && cd iree \
-  && git submodule update --init
+RUN git clone https://github.com/iree-org/iree.git \
+    && cd iree \
+    && git submodule update --init
 
 RUN cd iree && python3.11 -m pip install --force-reinstall -r runtime/bindings/python/iree/runtime/build_requirements.txt && \
   python3.11 -m pip uninstall -y numpy && \

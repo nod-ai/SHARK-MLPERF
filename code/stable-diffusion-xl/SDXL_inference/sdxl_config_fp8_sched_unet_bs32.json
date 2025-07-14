@@ -30,7 +30,7 @@
         ]
     },
     "unet_dtype": "float16",
-    "use_fp8_punet": true,
+    "unet_quant_dtype": "fp8",
     "use_scheduled_unet": true,
     "dims": [
         [
