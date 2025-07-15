@@ -67,7 +67,7 @@ ENV PYTHONPATH=/iree/build-release/runtime/bindings/python:/iree/build-release/c
 # Install shark-ai
 ######################################################
 
-RUN git clone https://github.com/nod-ai/shark-ai.git -b shared/mlperf-v5.0-sdxl \
+RUN git clone https://github.com/nod-ai/shark-ai.git -b sdxl-5.1-rebase \
   && cd shark-ai \
   && python3.11 -m pip uninstall torch torchvision torchaudio -y \
   && python3.11 -m pip install https://download.pytorch.org/whl/nightly/pytorch_triton_rocm-3.0.0%2B21eae954ef-cp311-cp311-linux_x86_64.whl \
