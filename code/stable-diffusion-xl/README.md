@@ -1,4 +1,4 @@
-# AMD MI300X/MI325X SDXL
+# AMD MI300X/MI325X/MI355 SDXL
 
 ## Machine setup
 1. Install latest public build of ROCM:
@@ -108,6 +108,9 @@ Each submission run command is preceded by a specific precompilation command. If
 The commands will execute performance, accuracy, and compliance tests for Offline and Server scenarios.
 
 NOTE: additional run commands and profiling options are described in [SDXL Inference](./SDXL_inference/README.md) documentation.
+
+NOTE: Either `export PYTHON_GIL=0` or prepend it to your shellscript exec command to go GIL-free. You will also need to be using the 3.13t container to run this way. Precompilation should be performed in the python3.11 container built via ../build_docker.sh
+TODO(@monorimet): Update documentation for nogil path
 ``` bash
 # MI300x
 
@@ -133,6 +136,20 @@ IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_
 IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_bs2.json
 # Run the server scenario.
 ./run_scenario_server_MI325x_cpx.sh
+```
+``` bash
+# MI355x:
+# Requires a different (rocm7) docker image. WIP.
+
+# Compile the SHARK engines (Offline)
+IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --model_json sdxl_config_fp8_ocp_sched_unet_bs32.json
+# Run the offline scenario.
+./run_scenario_offline_MI355x_cpx.sh
+
+# Compile the SHARK engines (Server)
+IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --model_json sdxl_config_fp8_ocp_sched_unet_bs2.json
+# Run the server scenario.
+./run_scenario_server_MI355x_cpx.sh
 ```
 
 ### Troubleshooting
