@@ -99,7 +99,7 @@ for modelname in "clip" "scheduled_unet" "vae"; do
         "--model-weights-path=$model_weights/checkpoint_pipe"
         "--scheduler-config-path=$model_weights/checkpoint_scheduler"
         "--force-update=$force_export"
-        "--iree-hal-target-device=amdgpu"
+        "--iree-hal-target-device=hip"
         "--iree-hip-target=gfx942"
         "--iree-compile-extra-args=$ireec_extra_args"
         "--quant-path=$quant_path"

@@ -233,7 +233,7 @@ class SDXLShortfinService:
         model_params = ModelParams.load_json(script_path)
         vmfbs, params = find_modules(
             target="gfx942",
-            device="amdgpu",
+            device="hip",
             model_config=script_path,
             artifacts_dir=self.model_weights,
         )

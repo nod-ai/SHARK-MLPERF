@@ -133,7 +133,7 @@ def find_modules(
     vmfbs = {}
     params = {}
     for submodel in mod_params.module_names.keys():
-        vmfb_filenames = get_vmfb_filenames(mod_params, submodel, "amdgpu-" + target)
+        vmfb_filenames = get_vmfb_filenames(mod_params, submodel, "hip-" + target)
         vmfbs[submodel] = {}
         for bs in mod_params.batch_sizes[submodel]:
             vmfbs[submodel][bs] = [os.path.join(vmfbs_dir, vmfb_filename) for vmfb_filename in vmfb_filenames]
