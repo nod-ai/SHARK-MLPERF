@@ -10,6 +10,7 @@ usage() {
 model_weights="/models/SDXL/official_pytorch/fp16/stable_diffusion_fp16"
 model_json="sdxl_config_fp8_sched_unet.json"
 flag_file="sdxl_flagfile_gfx942.txt"
+target="gfx942"
 td_spec="attention_and_matmul_spec_gfx942_MI325.mlir"
 force_export=false
 gpu_batch_size=""
@@ -25,6 +26,8 @@ while [[ "$#" -gt 0 ]]; do
             model_json="$2"; shift 2;;
         --flag_file)
             flag_file="$2"; shift 2;;
+        --target)
+            target="$2"; shift 2;;
         --td_spec)
             td_spec="$2"; shift 2;;
         --force_export)
@@ -91,7 +94,7 @@ for modelname in "clip" "scheduled_unet" "vae"; do
     builder_args=(
         python3.11 -m iree.build "$shortfin_dir/components/builders.py"
         "--model-json=$script_path"
-        "--target=gfx942"
+        "--target=$target"
         "--splat=false"
         "--build-preference=export"
         "--output-dir=$model_weights"
@@ -100,7 +103,7 @@ for modelname in "clip" "scheduled_unet" "vae"; do
         "--scheduler-config-path=$model_weights/checkpoint_scheduler"
         "--force-update=$force_export"
         "--iree-hal-target-device=hip"
-        "--iree-hip-target=gfx942"
+        "--iree-hip-target=$target"
         "--iree-compile-extra-args=$ireec_extra_args"
         "--quant-path=$quant_path"
     )
