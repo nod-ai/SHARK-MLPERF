@@ -5,9 +5,9 @@ SCENARIO="Offline"
 BATCH_SIZE=32
 COUNT=51200
 QPS=17
-FPD=1
+FPD=2
 CPD=1
-SYSTEM_CONFIG_ID="8xMI325x_2xEPYC-9655"
+SYSTEM_CONFIG_ID="8xMI355_2xEPYC-9655"
 
 # constants
 OUTPUT_ROOT=$RESULT_DIR/closed/AMD
@@ -34,7 +34,7 @@ function run_scenario {
 		--test_mode PerformanceOnly \
 		--logfile_outdir ${RESULTS_ROOT}/${SCENARIO}/performance/run_1 \
   		--vae_batch_size 1 \
-		--model_json=sdxl_config_fp8_sched_unet_bs$BATCH_SIZE.json 
+		--model_json=sdxl_config_fp8_ocp_sched_unet_bs$BATCH_SIZE.json 
 
 	echo "Finished performance test."
 	echo "Run $SCENARIO accuracy test"
@@ -49,7 +49,7 @@ function run_scenario {
 		--test_mode AccuracyOnly \
 		--logfile_outdir ${RESULTS_ROOT}/${SCENARIO}/accuracy \
   		--vae_batch_size 1 \
-		--model_json=sdxl_config_fp8_sched_unet_bs$BATCH_SIZE.json 
+		--model_json=sdxl_config_fp8_ocp_sched_unet_bs$BATCH_SIZE.json 
 
 	echo "Finished accuracy test."
 
@@ -67,7 +67,7 @@ function run_scenario {
 		pushd .
 		cd /mlperf/inference/compliance/nvidia/$TEST
 		# NOTE: script will create TEST0n directory in given output directory
-		python3.11 run_verification.py -r $SCENARIO_RESULT -c $SCENARIO_RESULT/$TEST -o ${COMP_OUTPUT}
+		python3.13 run_verification.py -r $SCENARIO_RESULT -c $SCENARIO_RESULT/$TEST -o ${COMP_OUTPUT}
 		popd
 	done
 }
@@ -87,7 +87,7 @@ function run_compliance_test {
 		--test_mode PerformanceOnly \
 		--logfile_outdir ${RESULTS_ROOT}/${SCENARIO}/$TEST \
   		--vae_batch_size 1 \
-		--model_json=sdxl_config_fp8_sched_unet_bs$BATCH_SIZE.json 
+		--model_json=sdxl_config_fp8_ocp_sched_unet_bs$BATCH_SIZE.json 
 	rm audit.config
 }
 function copy_audit
