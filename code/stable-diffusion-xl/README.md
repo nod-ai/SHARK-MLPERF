@@ -68,6 +68,12 @@ exit
 ### AMD MLPerf Inference Docker Container Setup
 
 From `code/stable-diffusion-xl/`:
+
+Convenience shellscripts are provided in this directory. To precompile models, run `./build_docker.sh`, `./run_docker.sh`, and then follow the steps below to precompile.
+
+For best performance, once precompilation has finished, exit the container and run `./build_docker_nogil.sh` and `./run_docker_nogil.sh`, then run the scenario shellscript as shown below.
+
+On MI355, use `./build_docker_mi355.sh` and `./run_docker_mi355.sh`. GIL-free is temporarily unavailable for this target.
 ```bash
 
 # Build the container
@@ -109,8 +115,8 @@ The commands will execute performance, accuracy, and compliance tests for Offlin
 
 NOTE: additional run commands and profiling options are described in [SDXL Inference](./SDXL_inference/README.md) documentation.
 
-NOTE: Either `export PYTHON_GIL=0` or prepend it to your shellscript exec command to go GIL-free. You will also need to be using the 3.13t container to run this way. Precompilation should be performed in the python3.11 container built via ../build_docker.sh
-TODO(@monorimet): Update documentation for nogil path
+### NOTE: 
+> Either `export PYTHON_GIL=0` or prepend it to your shellscript exec command to go GIL-free. You will also need to be using the 3.13t container to run this way. Precompilation should be performed in the python3.11 container built via ../build_docker.sh, and the scenario can then be executed with the precompiled artifacts by the nogil docker build (../build_docker_nogil.sh) with the commands below.
 ``` bash
 # MI300x
 
@@ -138,18 +144,18 @@ IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_
 ./run_scenario_server_MI325x_cpx.sh
 ```
 ``` bash
-# MI355x:
-# Requires a different (rocm7) docker image. WIP.
+# MI355:
+# Requires a different (rocm7) docker image. See instructions above.
 
 # Compile the SHARK engines (Offline)
-IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --model_json sdxl_config_fp8_ocp_sched_unet_bs32.json
+IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --model_json sdxl_config_fp8_ocp_sched_unet_bs32.json --target gfx950 --flag_file "sdxl_flagfile_gfx950.txt" --td_spec ""
 # Run the offline scenario.
-./run_scenario_offline_MI355x_cpx.sh
+./run_scenario_offline_MI355.sh
 
 # Compile the SHARK engines (Server)
-IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --model_json sdxl_config_fp8_ocp_sched_unet_bs2.json
+IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --model_json sdxl_config_fp8_ocp_sched_unet_bs2.json --target gfx950 --flag_file "sdxl_flagfile_gfx950.txt" --td_spec ""
 # Run the server scenario.
-./run_scenario_server_MI355x_cpx.sh
+./run_scenario_server_MI355.sh
 ```
 
 ### Troubleshooting
