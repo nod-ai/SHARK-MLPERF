@@ -1,23 +1,8 @@
-#!/bin/bash
-# Copyright (c) 2024, NVIDIA CORPORATION.  All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 # $1 indicates the subdirectory (i.e. models or data)
 # $2 indicates the benchmark name (i.e. ResNet50, dlrm, etc.)
-# $3 indicates the URL to download from
-# $4 indicates the destination filename
-function download_file {
+# $3 indicates the destination filename
+function download_sdxl_file {
     _SUB_DIR=$1/$2
 
     if [ ! -d ${_SUB_DIR} ]; then
@@ -25,6 +10,11 @@ function download_file {
         mkdir -p ${_SUB_DIR}
     fi
     echo "Downloading $2 $1..." \
-        && wget $3 -O ${_SUB_DIR}/$4 \
-        && echo "Saved $2 $1 to ${_SUB_DIR}/$4!"
+        && echo ${_SUB_DIR}/$3 \
+        && sudo -v ; curl https://rclone.org/install.sh | sudo bash \
+        && rclone config create mlc-inference s3 provider=Cloudflare access_key_id=f65ba5eef400db161ea49967de89f47b secret_access_key=fbea333914c292b854f14d3fe232bad6c5407bf0ab1bebf78833c2b359bdfd2b endpoint=https://c2686074cb2caf5cbaf6d134bdba8b47.r2.cloudflarestorage.com
+    cd ${SUB_DIR} 
+    sudo rclone copy mlc-inference:mlcommons-inference-wg-public/stable_diffusion_fp16 ${_SUB_DIR} -P --no-check-certificate
+    echo "Saved $2 $1 to ${_SUB_DIR}/$3!"
+    cd -
 }

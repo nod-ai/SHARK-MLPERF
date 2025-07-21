@@ -19,11 +19,10 @@ MODEL_DIR=/models
 
 if [ -e "${MODEL_DIR}/SDXL/official_pytorch/fp16" ]
 then
-    echo "Model zip for SDXL already exists!"
+    echo "Model directory for SDXL already exists!"
 else
     # Download the fp16 raw weights of MLCommon hosted HF checkpoints
-    download_file ${MODEL_DIR} SDXL/official_pytorch/fp16 \
-        https://cloud.mlcommons.org/index.php/s/LCdW5RM6wgGWbxC/download \
+    download_sdxl_file ${MODEL_DIR} SDXL/official_pytorch/fp16/stable_diffusion_fp16 \
         stable_diffusion_fp16.zip
 fi
 
