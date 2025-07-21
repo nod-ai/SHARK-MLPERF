@@ -74,7 +74,7 @@ ENV UNSAFE_PYO3_BUILD_FREE_THREADED=1
 RUN git clone https://github.com/nod-ai/shark-ai.git -b sdxl-5.1-rebase \
     && cd shark-ai \
     && pip install aiohttp==3.9.5 \
-    && pip install -r requirements-iree-pinned.txt -r shortfin/requirements-tests-nogil.txt shortfin/ \
+    && pip install -r requirements-iree-pinned.txt -r sharktank/requirements.txt -r shortfin/requirements-tests-nogil.txt shortfin/ \
     && pip uninstall -y fastapi
 
 # enable RPD
