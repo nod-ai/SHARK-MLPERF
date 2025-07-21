@@ -235,12 +235,12 @@ class SampleProcessor(Process):
         tokenizers = []
         tokenizers.append(
             Tokenizer.from_pretrained(
-                "stabilityai/stable-diffusion-xl-base-1.0", subfolder="tokenizer"
+                os.path.join(self.model_weights, "checkpoint_pipe"), subfolder="tokenizer"
             )
         )
         tokenizers.append(
             Tokenizer.from_pretrained(
-                "stabilityai/stable-diffusion-xl-base-1.0", subfolder="tokenizer_2"
+                os.path.join(self.model_weights, "checkpoint_pipe"), subfolder="tokenizer_2"
             )
         )
 
