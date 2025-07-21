@@ -28,12 +28,17 @@ sudo rocm-smi --setcomputepartition CPX
 
 ## Submission Setup
 
+Clone this repository with the staging-v5.1 branch:
+```bash
+git clone https://github.com/nod-ai/SHARK-MLPERF -b staging-v5.1
+```
+
 ### Quantization
 NOTE: Running quantization will require 2 or more hours (on GPU) to complete, and much longer on CPU. As a matter of convenience, the weights that result from this quantization are also available from [huggingface](https://huggingface.co/amd-shark/sdxl-quant-models). To skip quantization and work from downloaded weights, please jump to the [AMD MLPerf Inference Docker Container Setup](#amd-mlperf-inference-docker-container-setup) section.
 
 Create the container that will be used for dataset preparation and model quantization
 ```bash
-cd quant_sdxl
+cd SHARK-MLPERF/code/stable-diffusion-xl/quant_sdxl
 
 # Build quantization container
 docker build --tag  mlperf_rocm_sdxl:quant --file Dockerfile .
@@ -67,7 +72,7 @@ exit
 
 ### AMD MLPerf Inference Docker Container Setup
 
-From `code/stable-diffusion-xl/`:
+From `SHARK-MLPERF/code/stable-diffusion-xl/`:
 
 Convenience shellscripts are provided in this directory. To precompile models, run `./build_docker.sh`, `./run_docker.sh`, and then follow the steps below to precompile.
 
