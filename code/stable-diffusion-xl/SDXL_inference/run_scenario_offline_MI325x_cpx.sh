@@ -23,7 +23,7 @@ function run_scenario {
 	RESULTS_ROOT=${OUTPUT_ROOT}/results/${SYSTEM_CONFIG_ID}/stable-diffusion-xl
 	COMP_ROOT=${OUTPUT_ROOT}/compliance/${SYSTEM_CONFIG_ID}/stable-diffusion-xl
 	echo "Run $SCENARIO performance test"
-	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.13 harness.py \
+	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
 		--cores_per_devices $CPD \
@@ -39,7 +39,7 @@ function run_scenario {
 	echo "Finished performance test."
 	echo "Run $SCENARIO accuracy test"
 
-	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.13 harness.py \
+	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
 		--cores_per_devices $CPD \
@@ -77,7 +77,7 @@ function run_compliance_test {
 
 	copy_audit $TEST
 	echo "Run $SCENARIO $TEST test"
-	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.13 harness.py \
+	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
 		--cores_per_devices $CPD \

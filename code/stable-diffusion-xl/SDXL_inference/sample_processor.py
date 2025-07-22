@@ -12,7 +12,7 @@ from multiprocessing import Process
 import numa_helpers
 
 from shortfin_apps.sd.components.config_struct import ModelParams
-from shortfin_apps.sd.components.manager import SystemManager
+from shortfin_apps.utils import SystemManager
 from shortfin_apps.sd.components.service import SDXLGenerateService
 from shortfin_apps.sd.components.tokenizer import Tokenizer
 
@@ -217,7 +217,7 @@ class SampleProcessor(Process):
             else lambda _: None
         )
 
-        self.sysman = SystemManager("amdgpu", [self.device_id], True)
+        self.sysman = SystemManager("amdgpu", [self.device_id], async_allocs=True, async_caching=True, amdgpu_allow_device_reuse=True)
 
         # Load here to avoid pickling errors.
         script_dir = os.path.dirname(os.path.abspath(__file__))
