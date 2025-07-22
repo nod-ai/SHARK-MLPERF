@@ -1,6 +1,6 @@
 #!/bin/bash
 shopt -s expand_aliases
-source ~/.bashrc
+source ~/.bash_aliases
 set -euxo pipefail
 RESULT_DIR="/mlperf/harness/Submission/"
 SCENARIO="Offline"

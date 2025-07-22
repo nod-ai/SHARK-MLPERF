@@ -129,7 +129,7 @@ RUN git clone https://github.com/ROCm/rocm_bandwidth_test --depth 1 rocm_bandwid
 # copy the harness code to the docker image
 COPY SDXL_inference /mlperf/harness
 
-RUN alias python='python3.11'
+RUN echo "alias python='python3.11'" >> ~/.bash_aliases
 
 # initialization settings for CPX mode
 ENV HSA_USE_SVM=0
