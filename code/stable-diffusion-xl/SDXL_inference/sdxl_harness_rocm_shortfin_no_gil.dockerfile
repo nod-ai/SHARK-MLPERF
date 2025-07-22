@@ -12,7 +12,9 @@ RUN apt-get update && apt-get install -y \
     build-essential libssl-dev zlib1g-dev \
     libbz2-dev libreadline-dev libsqlite3-dev curl git \
     libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev \
-    libgdbm-dev libgdbm-compat-dev libdb-dev
+    libgdbm-dev libgdbm-compat-dev libdb-dev python3.11 \
+    python3.11-dev python3.11-venv
+
 RUN git clone https://github.com/pyenv/pyenv.git /root/.pyenv
 ENV PYENV_ROOT="/root/.pyenv"
 ENV PATH="${PYENV_ROOT}/bin:${PYENV_ROOT}/shims:${PATH}"
@@ -95,6 +97,8 @@ RUN git clone https://github.com/ROCm/rocm_bandwidth_test --depth 1 rocm_bandwid
 
 # copy the harness code to the docker image
 COPY SDXL_inference /mlperf/harness
+
+RUN alias python='python3.13'
 
 # initialization settings for CPX mode
 ENV HSA_USE_SVM=0

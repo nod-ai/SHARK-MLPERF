@@ -118,22 +118,25 @@ Run the commands below in an inference container to reproduce full submission re
 Each submission run command is preceded by a specific precompilation command. If you encounter issues with the precompilation, please file an issue at [shark-ai/issues](https://github.com/nod-ai/shark-ai/issues)
 The commands will execute performance, accuracy, and compliance tests for Offline and Server scenarios.
 
-NOTE: additional run commands and profiling options are described in [SDXL Inference](./SDXL_inference/README.md) documentation.
+Best results are achieved through use of free-threaded python (3.13t) where GIL is optional
+### NOTE (GIL-FREE): 
+> Precompilation should be performed in the python3.11 container built via ../build_docker.sh, and the scenario can then be executed with the precompiled artifacts by the nogil docker build (../build_docker_nogil.sh) with the shellscript commands below. The environment variable has no effect if you are not using python3.13t, so we include it in the commands below as a convenience.
 
-### NOTE: 
-> Either `export PYTHON_GIL=0` or prepend it to your shellscript exec command to go GIL-free. You will also need to be using the 3.13t container to run this way. Precompilation should be performed in the python3.11 container built via ../build_docker.sh, and the scenario can then be executed with the precompiled artifacts by the nogil docker build (../build_docker_nogil.sh) with the commands below.
+### NOTE (GIL-FREE):
+> The precompile command and the run_scenario.sh should be executed in separate docker containers for best performance. Once you have finished precompiling, the artifacts will be saved to your disk, and picked up in the python3.13t docker container.
+
 ``` bash
 # MI300x
 
 # Compile the SHARK engines (Offline)
 IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_bs2.json
 # Run the offline scenario.
-./run_scenario_offline_MI300x_cpx.sh
+PYTHON_GIL=0 ./run_scenario_offline_MI300x_cpx.sh
 
 # Compile the SHARK engines (Server)
 IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_bs1.json
 # Run the server scenario.
-./run_scenario_server_MI300x_cpx.sh
+PYTHON_GIL=0 ./run_scenario_server_MI300x_cpx.sh
 ```
 ``` bash
 # MI325x
@@ -141,12 +144,12 @@ IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_
 # Compile the SHARK engines (Offline)
 IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_bs32.json
 # Run the offline scenario.
-./run_scenario_offline_MI325x_cpx.sh
+PYTHON_GIL=0 ./run_scenario_offline_MI325x_cpx.sh
 
 # Compile the SHARK engines (Server)
 IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_bs2.json
 # Run the server scenario.
-./run_scenario_server_MI325x_cpx.sh
+PYTHON_GIL=0 ./run_scenario_server_MI325x_cpx.sh
 ```
 ``` bash
 # MI355:
@@ -155,23 +158,10 @@ IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_
 # Compile the SHARK engines (Offline)
 IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --model_json sdxl_config_fp8_ocp_sched_unet_bs32.json --target gfx950 --flag_file "sdxl_flagfile_gfx950.txt" --td_spec ""
 # Run the offline scenario.
-./run_scenario_offline_MI355.sh
+PYTHON_GIL=0 ./run_scenario_offline_MI355.sh
 
 # Compile the SHARK engines (Server)
 IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --model_json sdxl_config_fp8_ocp_sched_unet_bs2.json --target gfx950 --flag_file "sdxl_flagfile_gfx950.txt" --td_spec ""
 # Run the server scenario.
-./run_scenario_server_MI355.sh
+PYTHON_GIL=0 ./run_scenario_server_MI355.sh
 ```
-
-### Troubleshooting
-
-When you see error
-```bash
-ValueError: shortfin_iree-src/runtime/src/iree/io/parameter_index.c:237: NOT_FOUND; no parameter found in index with key 'down_blocks.1.attentions.0.transformer_blocks.0.attn1.out_q:rscale'
-```
-Please execute command
-```bash
-rm /models/SDXL/official_pytorch/fp16/stable_diffusion_fp16/genfiles/sdxl/stable_diffusion_xl_base_1_0_punet_dataset_i8.irpa
-```
-Then re-run the harness.py
-
