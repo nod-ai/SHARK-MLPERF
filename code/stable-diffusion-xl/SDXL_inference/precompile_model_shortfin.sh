@@ -2,7 +2,7 @@
 
 # Function to display usage
 usage() {
-    echo "Usage: $0 [--model_weights <path>] [--model_json <file>] [--flag_file <file>] [--td_spec <file>] [--force_export <True|False>] [--gpu_batch_size <int>] [--vae_batch_size <int>] [--quant_path <path>]"
+    echo "Usage: $0 [--model_weights <path>] [--model_json <file>] [--flag_file <file>] [--td_spec <file>] [--force_export <True|False>] [--gpu_batch_size <int>] [--vae_batch_size <int>] [--quant_path <path>] [--punet_irpa <path>]"
     exit 1
 }
 
@@ -16,6 +16,7 @@ force_export=false
 gpu_batch_size=""
 vae_batch_size=""
 quant_path="/models/SDXL/official_pytorch/fp16/stable_diffusion_fp16/safetensors_quant"
+punet_irpa=""
 
 # Parse arguments
 while [[ "$#" -gt 0 ]]; do
@@ -38,6 +39,8 @@ while [[ "$#" -gt 0 ]]; do
             vae_batch_size="$2"; shift 2;;
         --quant_path)
             quant_path="$2"; shift 2;;
+        --punet_irpa)
+            punet_irpa="$2"; shift 2;;
         *)
             usage;;
     esac
@@ -106,6 +109,7 @@ for modelname in "clip" "scheduled_unet" "vae"; do
         "--iree-hip-target=$target"
         "--iree-compile-extra-args=$ireec_extra_args"
         "--quant-path=$quant_path"
+        "--punet-irpa-path=$punet_irpa"
     )
     
     echo "Executing: ${builder_args[*]}"
