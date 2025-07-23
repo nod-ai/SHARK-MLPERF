@@ -5,7 +5,7 @@ set -euxo pipefail
 RESULT_DIR="/mlperf/harness/Submission/"
 SCENARIO="Offline"
 BATCH_SIZE=32
-COUNT=51200
+COUNT=107400
 QPS=17
 FPD=2
 CPD=1
