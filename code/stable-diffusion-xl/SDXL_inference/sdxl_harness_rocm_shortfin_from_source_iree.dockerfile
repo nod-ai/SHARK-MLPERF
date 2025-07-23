@@ -49,7 +49,7 @@ RUN git clone https://github.com/nod-ai/shark-ai.git -b sdxl-5.1-rebase \
   && cd shark-ai \
   && python3.11 -m pip uninstall torch torchvision torchaudio -y \
   && python3.11 -m pip install -r pytorch-cpu-requirements.txt \
-  && python3.11 -m pip install iree-base-compiler==3.6.0 iree-base-runtime==3.6.0 iree-turbine==3.6.0 -f https://iree.dev/pip-release-links.html \
+  && python3.11 -m pip install --pre iree-base-compiler==3.7.0rc20250723 iree-base-runtime==3.7.0rc20250723 iree-turbine==3.7.0rc20250723 -f https://iree.dev/pip-release-links.html \
   && python3.11 -m pip install -r requirements.txt -e sharktank/ -e shortfin/
 
 # enable RPD
