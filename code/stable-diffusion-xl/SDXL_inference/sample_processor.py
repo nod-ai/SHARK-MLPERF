@@ -13,7 +13,7 @@ import numa_helpers
 
 from shortfin_apps.sd.components.config_struct import ModelParams
 from shortfin_apps.sd.components.manager import SystemManager
-from shortfin_apps.sd.components.service import SDXLGenerateService
+from shortfin_apps.sd.components.service import GenerateService
 from shortfin_apps.sd.components.tokenizer import Tokenizer
 
 from utilities import CONFIG, rpd_trace, gen_input_ids
@@ -34,7 +34,7 @@ def create_service(
     trace_execution=False,
     amdgpu_async_allocations=True,
 ):
-    sdxl_service = SDXLGenerateService(
+    sdxl_service = GenerateService(
         name="sd",
         sysman=sysman,
         tokenizers=tokenizers,

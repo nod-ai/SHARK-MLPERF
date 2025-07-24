@@ -103,10 +103,10 @@ ENV PYTHONPATH=/app/vllm/iree/build-release/runtime/bindings/python:/app/vllm/ir
 # Install shark-ai
 ######################################################
 
-RUN git clone https://github.com/nod-ai/shark-ai.git -b sdxl-5.1-rebase \
+RUN git clone https://github.com/nod-ai/shark-ai.git -b shared/mlperf-v5.1-sdxl \
   && cd shark-ai \
   && python3.11 -m pip uninstall torch torchvision torchaudio -y \
-  && python3.11 -m pip install -r pytorch-cpu-requirements.txt \
+  && python3.11 -m pip install torch==2.5.1+cpu torchvision --index-url https://download.pytorch.org/whl/cpu \
   && python3.11 -m pip install -r requirements.txt -r requirements-iree-pinned.txt -e sharktank/ -e shortfin/ \
   && pip uninstall iree-base-compiler iree-base-runtime -y
 

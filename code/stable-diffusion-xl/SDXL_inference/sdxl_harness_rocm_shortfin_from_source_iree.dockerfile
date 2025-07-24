@@ -45,10 +45,10 @@ ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 # Install shark-ai
 ######################################################
 
-RUN git clone https://github.com/nod-ai/shark-ai.git -b sdxl-5.1-rebase \
+RUN git clone https://github.com/nod-ai/shark-ai.git -b shared/mlperf-v5.1-sdxl \
   && cd shark-ai \
   && python3.11 -m pip uninstall torch torchvision torchaudio -y \
-  && python3.11 -m pip install -r pytorch-cpu-requirements.txt \
+  && python3.11 -m pip install torch==2.5.1+cpu torchvision --index-url https://download.pytorch.org/whl/cpu
   && python3.11 -m pip install --pre iree-base-compiler==3.7.0rc20250723 iree-base-runtime==3.7.0rc20250723 iree-turbine==3.7.0rc20250723 -f https://iree.dev/pip-release-links.html \
   && python3.11 -m pip install -r requirements.txt -e sharktank/ -e shortfin/
 

@@ -50,13 +50,16 @@ RUN mkdir /mlperf/ && cd /mlperf && \
     git clone --recursive https://github.com/jinchen62/inference.git -b fix-nogil-build && \
     cd inference/loadgen && \
     mkdir -p /mlperf/harness/ && \
-    CFLAGS="-std=c++14" python setup.py install
+    CFLAGS="-std=c++14" python setup.py install && \
+    CFLAGS="-std=c++14" python3.11 setup.py install
 
 RUN mkdir -p /mlperf/shark_reference/ && cp -r /mlperf/inference/text_to_image/* /mlperf/shark_reference/ && cp /mlperf/inference/mlperf.conf /mlperf/shark_reference/
 RUN pip install --pre scipy pycocotools
 RUN cd /mlperf/shark_reference/ \
     && pip install --no-deps --no-cache-dir -r requirements.txt \
-    && pip install ftfy timm
+    && python3.11 -m pip install --no-deps --no-cache-dir -r requirements.txt \
+    && pip install ftfy timm \
+    && python3.11 -m pip install ftfy timm
 RUN mkdir -p /mlperf/quant_sdxl/
 COPY ./quant_sdxl/* /mlperf/quant_sdxl/
 
@@ -73,7 +76,7 @@ ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 
 ENV UNSAFE_PYO3_BUILD_FREE_THREADED=1
 
-RUN git clone https://github.com/nod-ai/shark-ai.git -b sdxl-5.1-rebase \
+RUN git clone https://github.com/nod-ai/shark-ai.git -b shared/mlperf-v5.1-sdxl \
     && cd shark-ai \
     && pip install aiohttp==3.9.5 \
     && pip install -r requirements-iree-pinned.txt -r sharktank/requirements.txt -r shortfin/requirements-tests-nogil.txt shortfin/ \
