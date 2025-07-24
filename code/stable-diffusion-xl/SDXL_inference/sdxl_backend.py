@@ -64,7 +64,8 @@ class SDXLShortfinService:
         td_spec: str | None = None,
         log_sample_get: bool = False,
         debug: bool = False,
-        force_export: bool = False
+        force_export: bool = False,
+        enable_trace: bool = False,
     ):
         self.devices = devices if not debug else [0]
         self.gpu_batch_size = gpu_batch_size
@@ -134,6 +135,11 @@ class SDXLShortfinService:
                 )
                 if use_response_pipes:
                     self.response_pipes.append(JoinableQueue())
+                
+                if enable_trace and (core_id == device_id == 0):
+                    os.environ["SHORTFIN_PY_RUNTIME"] = "tracy"
+                elif enable_trace:
+                    os.environ["SHORTFIN_PY_RUNTIME"] = "default"
 
                 # TODO: Refactor to nicer solution
                 implementation = SharkMicroShortfinProcessSamples

@@ -253,6 +253,13 @@ def get_args():
         default="iree_python_api",
     )
 
+    parser.add_argument(
+        "--enable_trace",
+        type=str2bool,
+        default=False,
+        help="Use tracy runtime on first sample processor instantiated."
+    )
+
     args = parser.parse_args()
     return args
 
@@ -379,6 +386,7 @@ def mlperf(args):
         log_sample_get=args.log_sample_get,
         debug=args.debug,
         force_export=args.force_export,
+        enable_trace=args.enable_trace,
     )
 
     with open(Path(args.logfile_outdir, "command.txt"), "w") as f:
