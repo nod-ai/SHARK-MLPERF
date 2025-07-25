@@ -34,21 +34,41 @@ COPY ./quant_sdxl/* /mlperf/quant_sdxl/
 ######################################################
 # Install iree tools
 ######################################################
-
 SHELL ["/bin/bash", "-c"]
 
 # Disable apt-key parse waring
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 
+# # Checkout and build IREE
+# RUN git clone https://github.com/kuhar/iree.git -b reduction-bitwidth\
+#     && cd iree \
+#     && git submodule update --init
 
-######################################################
+# RUN cd iree && python3.11 -m pip install --force-reinstall -r runtime/bindings/python/iree/runtime/build_requirements.txt && \
+#   python3.11 -m pip uninstall -y numpy && \
+#   python3.11 -m pip install numpy==1.* && \
+#   cmake -S . -B build-release \
+#   -G Ninja -DCMAKE_BUILD_TYPE=Release \
+#   -DCMAKE_C_COMPILER=`which clang` -DCMAKE_CXX_COMPILER=`which clang++` \
+#   -DIREE_HAL_DRIVER_CUDA=OFF \
+#   -DIREE_BUILD_PYTHON_BINDINGS=ON \
+#   -DPython3_EXECUTABLE="$(which python3.11)" \
+#   -DIREE_TARGET_BACKEND_ROCM=ON \
+#   -DIREE_HAL_DRIVER_HIP=ON && \
+#   cmake --build build-release/ --target tools/all && \
+#   cmake --build build-release/ --target install
+
+# # Make IREE tools discoverable in PATH
+# ENV PATH=/iree/build-release/tools:$PATH
+# ENV PYTHONPATH=/iree/build-release/runtime/bindings/python:/iree/build-release/compiler/bindings/python
+# ######################################################
 # Install shark-ai
 ######################################################
 
 RUN git clone https://github.com/nod-ai/shark-ai.git -b shared/mlperf-v5.1-sdxl \
   && cd shark-ai \
   && python3.11 -m pip uninstall torch torchvision torchaudio -y \
-  && python3.11 -m pip install torch==2.5.1+cpu torchvision --index-url https://download.pytorch.org/whl/cpu
+  && python3.11 -m pip install torch==2.5.1+cpu torchvision --index-url https://download.pytorch.org/whl/cpu \
   && python3.11 -m pip install --pre iree-base-compiler==3.7.0rc20250723 iree-base-runtime==3.7.0rc20250723 iree-turbine==3.7.0rc20250723 -f https://iree.dev/pip-release-links.html \
   && python3.11 -m pip install -r requirements.txt -e sharktank/ -e shortfin/
 

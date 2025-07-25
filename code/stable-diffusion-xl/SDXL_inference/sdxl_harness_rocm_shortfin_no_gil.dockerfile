@@ -30,6 +30,7 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 
 RUN pip install --upgrade pip setuptools wheel
 RUN pip install --pre torch torchvision torchaudio --index-url https://download.pytorch.org/whl/nightly/rocm6.3
+
 RUN git clone https://github.com/vinayakdsci/tokenizers.git -b fix-cp-nogil-build-failures \
     && cd tokenizers/bindings/python \
     && pip install -e .
@@ -44,6 +45,7 @@ RUN apt-get update && apt-get install -y \
     curl cmake ninja-build clang lld vim nano gfortran pkg-config libopenblas-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN pip install pybind11 'nanobind<2' pandas
+RUN python3.11 -m pip install pybind11 'nanobind<2' pandas
 
 # install loadgen
 RUN mkdir /mlperf/ && cd /mlperf && \
@@ -78,7 +80,7 @@ ENV UNSAFE_PYO3_BUILD_FREE_THREADED=1
 
 RUN git clone https://github.com/nod-ai/shark-ai.git -b shared/mlperf-v5.1-sdxl \
     && cd shark-ai \
-    && pip install aiohttp==3.9.5 \
+    && pip install aiohttp==3.9.5 dataclasses_json \
     && pip install -r requirements-iree-pinned.txt -r sharktank/requirements.txt -r shortfin/requirements-tests-nogil.txt shortfin/ \
     && pip uninstall -y fastapi
 
