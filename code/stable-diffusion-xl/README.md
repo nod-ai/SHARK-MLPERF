@@ -142,7 +142,7 @@ PYTHON_GIL=0 ./run_scenario_server_MI300x_cpx.sh
 # MI325x
 
 # Compile the SHARK engines (Offline)
-IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_bs32.json
+IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325_bs32.mlir --model_json sdxl_config_fp8_sched_unet_bs32.json
 # Run the offline scenario.
 PYTHON_GIL=0 ./run_scenario_offline_MI325x_cpx.sh
 
