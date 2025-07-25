@@ -111,6 +111,23 @@ for modelname in "clip" "scheduled_unet" "vae"; do
         "--quant-path=$quant_path"
         "--punet-irpa-path=$punet_irpa"
     )
+    builder_args_print=(
+        python3.11 -m iree.build "$shortfin_dir/components/builders.py"
+        "--model-json=$script_path"
+        "--target=$target"
+        "--splat=false"
+        "--build-preference=export"
+        "--output-dir=$model_weights"
+        "--model=$modelname"
+        "--model-weights-path=$model_weights/checkpoint_pipe"
+        "--scheduler-config-path=$model_weights/checkpoint_scheduler"
+        "--force-update=$force_export"
+        "--iree-hal-target-device=hip"
+        "--iree-hip-target=$target"
+        "--iree-compile-extra-args=\\"$ireec_extra_args\\""
+        "--quant-path=$quant_path"
+        "--punet-irpa-path=$punet_irpa"
+    )
     
     echo "Executing: ${builder_args[*]}"
     output=$("${builder_args[@]}")

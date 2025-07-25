@@ -5,8 +5,8 @@ set -euxo pipefail
 RESULT_DIR="/mlperf/harness/Submission/"
 SCENARIO="Server"
 BATCH_SIZE=2
-QPS=16.7
-FPD=2
+QPS=16.2
+FPD=1
 CPD=2
 SYSTEM_CONFIG_ID="8xMI325x_2xEPYC-9655"
 
