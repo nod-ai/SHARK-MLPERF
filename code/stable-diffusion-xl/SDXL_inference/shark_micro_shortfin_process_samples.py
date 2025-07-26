@@ -8,7 +8,7 @@ from utilities import CONFIG, rpd_trace, ArgHolder, gen_input_ids
 
 import shortfin as sf
 
-from shortfin_apps.sd.components.messages import InferencePhase, InferenceExecRequest
+from shortfin_apps.sd.components.messages import InferencePhase, SDXLInferenceExecRequest
 from shortfin_apps.sd.components.service import InferenceExecutorProcess
 
 class MicroSDXLHarnessExecutor:
@@ -40,7 +40,7 @@ class Runner(sf.Process):
 
     async def run(self):
         args = self.args
-        self.exec = InferenceExecRequest(
+        self.exec = SDXLInferenceExecRequest(
             prompt=None,
             neg_prompt=None,
             input_ids=args.input_ids,
