@@ -17,6 +17,7 @@ gpu_batch_size=""
 vae_batch_size=""
 quant_path="/models/SDXL/official_pytorch/fp16/stable_diffusion_fp16/safetensors_quant"
 punet_irpa=""
+shortfin_dir="/shark-ai/shortfin/python/shortfin_apps/sd"
 
 # Parse arguments
 while [[ "$#" -gt 0 ]]; do
@@ -41,6 +42,8 @@ while [[ "$#" -gt 0 ]]; do
             quant_path="$2"; shift 2;;
         --punet_irpa)
             punet_irpa="$2"; shift 2;;
+        --shortfin_dir)
+            shortfin_dir="$2"; shift 2;;
         *)
             usage;;
     esac
@@ -53,7 +56,6 @@ flagfile="$script_dir/$flag_file"
 if [[ -n "$td_spec" ]]; then
     td_spec="$script_dir/$td_spec"
 fi
-shortfin_dir="/shark-ai/shortfin/python/shortfin_apps/sd"
 export IREE_BUILD_MP_CONTEXT="fork"
 
 # Modify JSON batch sizes
