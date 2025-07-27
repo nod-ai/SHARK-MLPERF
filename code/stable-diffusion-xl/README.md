@@ -156,12 +156,12 @@ PYTHON_GIL=0 ./run_scenario_server_MI325x_cpx.sh
 # Requires a different (rocm7) docker image. See instructions above.
 
 # Compile the SHARK engines (Offline)
-IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --model_json sdxl_config_fp8_ocp_sched_unet_bs32.json --target gfx950 --flag_file "sdxl_flagfile_gfx950.txt" --td_spec ""
+IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --model_json sdxl_config_fp8_ocp_sched_unet_bs32.json --target gfx950 --flag_file "sdxl_flagfile_gfx950.txt" --td_spec "" --shortfin_dir /app/vllm/shark-ai/shortfin/python/shortfin_apps/sd
 # Run the offline scenario.
 PYTHON_GIL=0 ./run_scenario_offline_MI355.sh
 
 # Compile the SHARK engines (Server)
-IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --model_json sdxl_config_fp8_ocp_sched_unet_bs2.json --target gfx950 --flag_file "sdxl_flagfile_gfx950.txt" --td_spec ""
+IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --model_json sdxl_config_fp8_ocp_sched_unet_bs2.json --target gfx950 --flag_file "sdxl_flagfile_gfx950.txt" --td_spec "" --shortfin_dir /app/vllm/shark-ai/shortfin/python/shortfin_apps/sd
 # Run the server scenario.
 PYTHON_GIL=0 ./run_scenario_server_MI355.sh
 ```

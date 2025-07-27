@@ -4,10 +4,10 @@ source ~/.bash_aliases
 set -euxo pipefail
 RESULT_DIR="/mlperf/harness/Submission/"
 SCENARIO="Offline"
-BATCH_SIZE=32
-COUNT=107400
+BATCH_SIZE=48
+COUNT=0
 QPS=17
-FPD=2
+FPD=1
 CPD=1
 SYSTEM_CONFIG_ID="8xMI355_2xEPYC-9655"
 
@@ -28,6 +28,7 @@ function run_scenario {
 	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
+		--target "gfx950" \
 		--cores_per_devices $CPD \
   		--count $COUNT \
 		--qps $QPS \
@@ -44,6 +45,7 @@ function run_scenario {
 	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
+		--target "gfx950" \
 		--cores_per_devices $CPD \
 		--fibers_per_device $FPD \
 		--scenario ${SCENARIO} \
@@ -62,7 +64,7 @@ function run_scenario {
 	COMP_OUTPUT=${COMP_ROOT}/$SCENARIO
 
 	# run verification checks
-	python3 -m pip install numpy
+	python3.11 -m pip install numpy pillow
 	for TEST in TEST01 TEST04 ; do
 		run_compliance_test $TEST
 	
@@ -82,6 +84,7 @@ function run_compliance_test {
 	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
+		--target "gfx950" \
 		--cores_per_devices $CPD \
 		--fibers_per_device $FPD \
 		--scenario ${SCENARIO} \

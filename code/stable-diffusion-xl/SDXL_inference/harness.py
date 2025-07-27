@@ -101,6 +101,12 @@ def get_args():
         help="Max Batch size to use for all devices and engines",
     )
     parser.add_argument(
+        "--target",
+        type=str,
+        default="gfx942",
+        help="Target chip for precompiled artifacts. Default is gfx942 for MI300x/MI325x, use gfx950 for MI350/MI355.",
+    )
+    parser.add_argument(
         "--verbose", type=str2bool, default=False, help="SUT verbose logging"
     )
     parser.add_argument(
@@ -365,6 +371,7 @@ def mlperf(args):
         model_weights=args.model_weights,
         dataset=Dataset(args.tensor_path),
         gpu_batch_size=args.gpu_batch_size,
+        target=args.target,
         verbose=args.verbose,
         enable_batcher=args.enable_batcher,
         batch_timeout_threashold=3 if args.enable_batcher else -1,

@@ -27,6 +27,7 @@ function run_scenario {
 	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
+		--target "gfx950" \
 		--cores_per_devices $CPD \
 		--qps $QPS \
 		--fibers_per_device $FPD \
@@ -43,6 +44,7 @@ function run_scenario {
 	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
+		--target "gfx950" \
 		--cores_per_devices $CPD \
 		--fibers_per_device $FPD \
 		--scenario ${SCENARIO} \
@@ -82,6 +84,7 @@ function run_compliance_test {
 	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
+		--target "gfx950" \
 		--cores_per_devices $CPD \
 		--fibers_per_device $FPD \
 		--scenario ${SCENARIO} \

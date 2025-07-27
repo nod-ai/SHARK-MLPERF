@@ -2,7 +2,7 @@
 
 # Function to display usage
 usage() {
-    echo "Usage: $0 [--model_weights <path>] [--model_json <file>] [--flag_file <file>] [--td_spec <file>] [--force_export <True|False>] [--gpu_batch_size <int>] [--vae_batch_size <int>] [--quant_path <path>] [--punet_irpa <path>]"
+    echo "Usage: $0 [--model_weights <path>] [--model_json <file>] [--flag_file <file>] [--td_spec <file>] [--force_export <True|False>] [--gpu_batch_size <int>] [--vae_batch_size <int>] [--quant_path <path>] [--punet_irpa <path>] [--shortfin_dir <path>] [--output_dir <path>]"
     exit 1
 }
 
@@ -18,6 +18,7 @@ vae_batch_size=""
 quant_path="/models/SDXL/official_pytorch/fp16/stable_diffusion_fp16/safetensors_quant"
 punet_irpa=""
 shortfin_dir="/shark-ai/shortfin/python/shortfin_apps/sd"
+output_dir="/models/SDXL/official_pytorch/fp16/stable_diffusion_fp16"
 
 # Parse arguments
 while [[ "$#" -gt 0 ]]; do
@@ -44,6 +45,8 @@ while [[ "$#" -gt 0 ]]; do
             punet_irpa="$2"; shift 2;;
         --shortfin_dir)
             shortfin_dir="$2"; shift 2;;
+        --output_dir)
+            output_dir="$2"; shift 2;;
         *)
             usage;;
     esac
@@ -102,7 +105,7 @@ for modelname in "clip" "scheduled_unet" "vae"; do
         "--target=$target"
         "--splat=false"
         "--build-preference=export"
-        "--output-dir=$model_weights"
+        "--output-dir=$output_dir"
         "--model=$modelname"
         "--model-weights-path=$model_weights/checkpoint_pipe"
         "--scheduler-config-path=$model_weights/checkpoint_scheduler"
@@ -119,19 +122,19 @@ for modelname in "clip" "scheduled_unet" "vae"; do
         "--target=$target"
         "--splat=false"
         "--build-preference=export"
-        "--output-dir=$model_weights"
+        "--output-dir=$output_dir"
         "--model=$modelname"
         "--model-weights-path=$model_weights/checkpoint_pipe"
         "--scheduler-config-path=$model_weights/checkpoint_scheduler"
         "--force-update=$force_export"
         "--iree-hal-target-device=hip"
         "--iree-hip-target=$target"
-        "--iree-compile-extra-args=\\"$ireec_extra_args\\""
+        "--iree-compile-extra-args=\"$ireec_extra_args\""
         "--quant-path=$quant_path"
         "--punet-irpa-path=$punet_irpa"
     )
     
-    echo "Executing: ${builder_args[*]}"
+    echo "Executing: ${builder_args_print[*]}"
     output=$("${builder_args[@]}")
 
 done

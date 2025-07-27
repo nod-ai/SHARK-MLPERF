@@ -44,6 +44,7 @@ class SDXLShortfinService:
         model_weights: List[str],
         dataset: Dataset,
         gpu_batch_size: int,
+        target: str = "gfx942",
         verbose: bool = False,
         enable_batcher: bool = False,
         batch_timeout_threashold: float = -1,
@@ -69,6 +70,7 @@ class SDXLShortfinService:
     ):
         self.devices = devices if not debug else [0]
         self.gpu_batch_size = gpu_batch_size
+        self.target = target
         self.dataset = dataset
         self.verbose = verbose
         self.enable_batcher = enable_batcher and batch_timeout_threashold > 0
@@ -238,7 +240,7 @@ class SDXLShortfinService:
         )
         model_params = ModelParams.load_json(script_path)
         vmfbs, params = find_modules(
-            target="gfx942",
+            target=self.target,
             device="hip",
             model_config=script_path,
             artifacts_dir=self.model_weights,

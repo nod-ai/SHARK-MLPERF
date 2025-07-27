@@ -1,4 +1,4 @@
-FROM rocm/7.0-preview:rocm7.0_preview_pytorch_training_mi35X_alpha
+FROM rocm/7.0-preview:rocm7.0_preview_ubuntu_22.04_vllm_0.8.5_mi35X_prealpha
 
 
 # ######################################################
@@ -8,6 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 SHELL ["/bin/bash", "-c"]
 
 # apt dependencies
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN apt-get --fix-broken install -y
 RUN apt-get update && apt-get install -y \
     ffmpeg libsm6 libxext6 git wget unzip \
