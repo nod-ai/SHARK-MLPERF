@@ -1,4 +1,4 @@
-from shortfin.python.shortfin_apps.sd.exports import export_sdxl_model
+from shortfin_apps.sd.components.exports import export_sdxl_model
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -26,7 +26,6 @@ res = export_sdxl_model(
     decomp_attn=False,  # Hardcoded
     quant_path=None,  # Hardcoded
     scheduler_config_path=args.hf_model_name, # Using hf_model_name
-    weights_only=False,  # Hardcoded
     punet_irpa_path=args.punet_irpa_path,
 )
 
