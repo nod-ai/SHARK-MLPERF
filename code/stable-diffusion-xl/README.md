@@ -76,26 +76,6 @@ Use the provided scripts:
 ./run_docker.sh
 ```
 
-Or, manually:
-```bash
-
-# Build the container
-docker build --platform linux/amd64 \
-  --tag mlperf_rocm_sdxl:micro_sfin_harness \
-  --file SDXL_inference/sdxl_harness_rocm_shortfin_from_source_iree.dockerfile .
-
-# Run the container
-docker run -it --network=host --device=/dev/kfd --device=/dev/dri \
-  --group-add video --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
-  -v /data/mlperf_sdxl/data:/data \
-  -v /data/mlperf_sdxl/models:/models \
-  -v `pwd`/SDXL_inference/:/mlperf/harness \
-  -e ROCR_VISIBLE_DEVICES=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63 \
-  -e HIP_VISIBLE_DEVICES=0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63 \
-  -w /mlperf/harness \
-  mlperf_rocm_sdxl:micro_sfin_harness
-```
-
 Preprocess data and prepare for run execution
 ```bash
 python3.11 preprocess_data.py
