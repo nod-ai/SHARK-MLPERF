@@ -1,4 +1,4 @@
-# AMD MI300X/MI325X SDXL
+# AMD MI325X SDXL
 
 ## Machine setup
 1. Install latest public build of ROCM:
@@ -68,6 +68,15 @@ exit
 ### AMD MLPerf Inference Docker Container Setup
 
 From `code/stable-diffusion-xl/`:
+
+Use the provided scripts:
+```bash
+./build_docker.sh
+./build_docker_nogil.sh
+./run_docker.sh
+```
+
+Or, manually:
 ```bash
 
 # Build the container
@@ -87,13 +96,6 @@ docker run -it --network=host --device=/dev/kfd --device=/dev/dri \
   mlperf_rocm_sdxl:micro_sfin_harness
 ```
 
-NOTE: skip this step if quantization methods were executed above; necessary data and models will already be in place
-```bash
-# Download data and base weights
-./download_data.sh
-./download_model.sh
-```
-
 Preprocess data and prepare for run execution
 ```bash
 python3.11 preprocess_data.py
@@ -102,37 +104,42 @@ python3.11 preprocess_data.py
 python3.11 process_quant.py
 ```
 
-## Reproduce Results
-Run the commands below in an inference container to reproduce full submission results.
-Each submission run command is preceded by a specific precompilation command. If you encounter issues with the precompilation, please file an issue at [shark-ai/issues](https://github.com/nod-ai/shark-ai/issues)
-The commands will execute performance, accuracy, and compliance tests for Offline and Server scenarios.
+## Precompile models
+Run the commands below in the first container to reproduce full submission results.
+Each submission run requires a certain set of precompiled model artifacts in the correct format.
+The precompile_model_shortfin.sh script uses shark-ai tooling to export and compile SDXL for MI325x.
 
-NOTE: additional run commands and profiling options are described in [SDXL Inference](./SDXL_inference/README.md) documentation.
-``` bash
-# MI300x
+For best results, prepare the offline and server mode artifacts at once.
 
-# Compile the SHARK engines (Offline)
-IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_bs2.json
-# Run the offline scenario.
-./run_scenario_offline_MI300x_cpx.sh
-
-# Compile the SHARK engines (Server)
-IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_bs1.json
-# Run the server scenario.
-./run_scenario_server_MI300x_cpx.sh
-```
 ``` bash
 # MI325x
 
 # Compile the SHARK engines (Offline)
-IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_bs16.json
-# Run the offline scenario.
-./run_scenario_offline_MI325x_cpx.sh
+IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325_bs32_mod.mlir --model_json sdxl_config_fp8_sched_unet_bs32.json
 
 # Compile the SHARK engines (Server)
 IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_bs2.json
-# Run the server scenario.
-./run_scenario_server_MI325x_cpx.sh
+
+```
+
+## Run scenario and reproduce results
+
+Now that you have successfully compiled artifacts for running SDXL, you may exit the docker container and run:
+```bash
+./run_docker_nogil.sh
+```
+This will pick up the previous container's result artifacts automatically.
+
+Once you are in this container, run:
+
+``` bash
+# MI325x
+
+# Offline
+PYTHON_GIL=0 ./run_scenario_offline_MI325x_cpx.sh
+
+# Server
+PYTHON_GIL=0 ./run_scenario_server_MI325x_cpx.sh
 ```
 
 ### Troubleshooting

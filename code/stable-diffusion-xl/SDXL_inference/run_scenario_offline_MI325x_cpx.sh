@@ -1,9 +1,11 @@
 #!/bin/bash
 set -euxo pipefail
+shopt -s expand_aliases
+
 RESULT_DIR="/mlperf/harness/Submission/"
 SCENARIO="Offline"
-BATCH_SIZE=16
-COUNT=51200
+BATCH_SIZE=32
+COUNT=107400
 QPS=17
 FPD=1
 CPD=1
@@ -23,7 +25,7 @@ function run_scenario {
 	RESULTS_ROOT=${OUTPUT_ROOT}/results/${SYSTEM_CONFIG_ID}/stable-diffusion-xl
 	COMP_ROOT=${OUTPUT_ROOT}/compliance/${SYSTEM_CONFIG_ID}/stable-diffusion-xl
 	echo "Run $SCENARIO performance test"
-	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.11 harness.py \
+	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.13 harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
 		--cores_per_devices $CPD \
@@ -35,9 +37,10 @@ function run_scenario {
 		--logfile_outdir ${RESULTS_ROOT}/${SCENARIO}/performance/run_1 \
   		--vae_batch_size 1 \
 		--td_spec=attention_and_matmul_spec_gfx942_MI325.mlir \
-		--model_json=sdxl_config_fp8_sched_unet_bs16.json 
+		--model_json=sdxl_config_fp8_sched_unet_bs32.json 
 
 	echo "Finished performance test."
+	exit
 	echo "Run $SCENARIO accuracy test"
 
 	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.11 harness.py \

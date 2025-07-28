@@ -12,7 +12,9 @@ RUN apt-get update && apt-get install -y \
     build-essential libssl-dev zlib1g-dev \
     libbz2-dev libreadline-dev libsqlite3-dev curl git \
     libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev \
-    libgdbm-dev libgdbm-compat-dev libdb-dev
+    libgdbm-dev libgdbm-compat-dev libdb-dev python3.11 \
+    python3.11-dev python3.11-venv
+
 RUN git clone https://github.com/pyenv/pyenv.git /root/.pyenv
 ENV PYENV_ROOT="/root/.pyenv"
 ENV PATH="${PYENV_ROOT}/bin:${PYENV_ROOT}/shims:${PATH}"
@@ -42,19 +44,22 @@ RUN apt-get update && apt-get install -y \
     curl cmake ninja-build clang lld vim nano gfortran pkg-config libopenblas-dev && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN pip install pybind11 'nanobind<2' pandas
+RUN python3.11 -m pip install pybind11 'nanobind<2' pandas
 
 # install loadgen
 RUN mkdir /mlperf/ && cd /mlperf && \
     git clone --recursive https://github.com/jinchen62/inference.git -b fix-nogil-build && \
     cd inference/loadgen && \
     mkdir -p /mlperf/harness/ && \
-    CFLAGS="-std=c++14" python setup.py install
+    CFLAGS="-std=c++14" python setup.py install && \
+    CFLAGS="-std=c++14" python3.11 setup.py install
 
 RUN mkdir -p /mlperf/shark_reference/ && cp -r /mlperf/inference/text_to_image/* /mlperf/shark_reference/ && cp /mlperf/inference/mlperf.conf /mlperf/shark_reference/
 RUN pip install --pre scipy pycocotools
 RUN cd /mlperf/shark_reference/ \
     && pip install --no-deps --no-cache-dir -r requirements.txt \
-    && pip install ftfy timm
+    && pip install ftfy timm \
+    && python3.11 -m pip install ftfy timm
 RUN mkdir -p /mlperf/quant_sdxl/
 COPY ./quant_sdxl/* /mlperf/quant_sdxl/
 
@@ -64,27 +69,6 @@ COPY ./quant_sdxl/* /mlperf/quant_sdxl/
 
 # Disable apt-key parse waring
 ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
-
-# Checkout and build IREE
-RUN git clone https://github.com/iree-org/iree.git -b shared/mlperf-v5.0-sdxl  \
-    && cd iree \
-    && git submodule update --init
-
-RUN cd iree && pip install --force-reinstall -r runtime/bindings/python/iree/runtime/build_requirements.txt && \
-    cmake -S . -B build-release \
-    -G Ninja -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_C_COMPILER=`which clang` -DCMAKE_CXX_COMPILER=`which clang++` \
-    -DIREE_HAL_DRIVER_CUDA=OFF \
-    -DIREE_BUILD_PYTHON_BINDINGS=ON \
-    -DPython3_EXECUTABLE="$(which python)" \
-    -DIREE_TARGET_BACKEND_ROCM=ON \
-    -DIREE_HAL_DRIVER_HIP=ON && \
-    cmake --build build-release/ --target tools/all && \
-    cmake --build build-release/ --target install
-
-# Make IREE tools discoverable in PATH
-ENV PATH=/iree/build-release/tools:$PATH
-ENV PYTHONPATH=/iree/build-release/runtime/bindings/python:/iree/build-release/compiler/bindings/python
 
 ######################################################
 # Install shark-ai
@@ -96,7 +80,7 @@ RUN git clone https://github.com/nod-ai/shark-ai.git -b shared/mlperf-v5.1-sdxl-
     && cd shark-ai \
     && pip install aiohttp==3.9.5 \
     && pip install -r requirements.txt -r requirements-iree-pinned.txt -e sharktank/ -e shortfin/ \
-    && pip uninstall -y iree-base-compiler iree-base-runtime fastapi
+    && pip uninstall -y fastapi
 
 # enable RPD
 RUN git clone https://github.com/ROCm/rocmProfileData.git \

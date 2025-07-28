@@ -2,7 +2,7 @@
 #####################################################################################
 # The MIT License (MIT)
 #
-# Copyright (c) 2015-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2015-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,11 +29,10 @@ MODEL_DIR=/models
 
 if [ -e "${MODEL_DIR}/SDXL/official_pytorch/fp16" ]
 then
-    echo "Model zip for SDXL already exists!"
+    echo "Model directory for SDXL already exists!"
 else
     # Download the fp16 raw weights of MLCommon hosted HF checkpoints
-    download_file ${MODEL_DIR} SDXL/official_pytorch/fp16 \
-        https://cloud.mlcommons.org/index.php/s/LCdW5RM6wgGWbxC/download \
+    download_sdxl_file ${MODEL_DIR} SDXL/official_pytorch/fp16/stable_diffusion_fp16 \
         stable_diffusion_fp16.zip
 fi
 
@@ -89,3 +88,4 @@ if [ $? -ne 0 ]; then
     echo "SDXL VAE fp16 model md5sum mismatch"
     exit -1
 fi
+

@@ -134,6 +134,12 @@ class SDXLShortfinService:
                 )
                 if use_response_pipes:
                     self.response_pipes.append(JoinableQueue())
+                enable_tracing = False
+                if enable_tracing:
+                    if core_id == device_id == 0:
+                        os.environ["SHORTFIN_PY_RUNTIME"] = "tracy"
+                    else:
+                        os.environ["SHORTFIN_PY_RUNTIME"] = "default"
 
                 # TODO: Refactor to nicer solution
                 implementation = SharkMicroShortfinProcessSamples
