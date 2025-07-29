@@ -43,7 +43,7 @@ function run_scenario {
 	echo "Finished performance test."
 	echo "Run $SCENARIO accuracy test"
 
-	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.11 harness.py \
+	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.13 harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
 		--cores_per_devices $CPD \
@@ -82,7 +82,7 @@ function run_compliance_test {
 
 	copy_audit $TEST
 	echo "Run $SCENARIO $TEST test"
-	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.11 harness.py \
+	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.13 harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
 		--cores_per_devices $CPD \
