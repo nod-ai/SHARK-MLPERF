@@ -41,7 +41,6 @@ function run_scenario {
 		--model_json=sdxl_config_fp8_sched_unet_bs32.json 
 
 	echo "Finished performance test."
-	exit
 	echo "Run $SCENARIO accuracy test"
 
 	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.11 harness.py \
