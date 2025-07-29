@@ -95,7 +95,7 @@ For best results, prepare the offline and server mode artifacts at once.
 # MI325x
 
 # Compile the SHARK engines (Offline)
-IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325_bs32_mod.mlir --model_json sdxl_config_fp8_sched_unet_bs32.json
+IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325_bs32.mlir --model_json sdxl_config_fp8_sched_unet_bs32.json
 
 # Compile the SHARK engines (Server)
 IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_bs2.json
