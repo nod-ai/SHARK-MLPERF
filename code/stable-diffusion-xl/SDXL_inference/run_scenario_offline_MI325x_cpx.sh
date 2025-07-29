@@ -5,7 +5,7 @@ shopt -s expand_aliases
 RESULT_DIR="/mlperf/harness/Submission/"
 SCENARIO="Offline"
 BATCH_SIZE=32
-COUNT=107400
+COUNT=0
 QPS=17
 FPD=1
 CPD=1
@@ -36,7 +36,7 @@ function run_scenario {
 		--test_mode PerformanceOnly \
 		--logfile_outdir ${RESULTS_ROOT}/${SCENARIO}/performance/run_1 \
   		--vae_batch_size 1 \
-		--num_sample_loops 1 \
+		--num_sample_loops 2 \
 		--td_spec=attention_and_matmul_spec_gfx942_MI325.mlir \
 		--model_json=sdxl_config_fp8_sched_unet_bs32.json 
 
