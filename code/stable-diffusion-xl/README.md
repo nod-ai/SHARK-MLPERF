@@ -104,8 +104,9 @@ IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_
 
 ## Run scenario and reproduce results
 
-Now that you have successfully compiled artifacts for running SDXL, you may exit the docker container and run:
+Now that you have successfully compiled artifacts for running SDXL, you may exit the docker container and run the nogil dockerfile:
 ```bash
+exit
 ./run_docker_nogil.sh
 ```
 This will pick up the previous container's result artifacts automatically.
