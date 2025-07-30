@@ -187,7 +187,7 @@ class SampleProcessor(Process):
 
         os.environ["ROCR_VISIBLE_DEVICES"] = f"{device_id}"
 
-        self.use_spinlock = bool(os.environ["PYTHON_GIL"])
+        self.use_spinlock = False if os.environ["PYTHON_GIL"] == 0 else True
 
         if isinstance(self.response_comm, multiprocessing.queues.JoinableQueue):
             self.send_response = self.response_comm.put_nowait
