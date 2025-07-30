@@ -33,6 +33,7 @@ def create_service(
     isolation="per_call",
     trace_execution=False,
     amdgpu_async_allocations=True,
+    use_spinlock=False,
 ):
     sdxl_service = GenerateService(
         name="sd",
@@ -44,6 +45,8 @@ def create_service(
         prog_isolation=isolation,
         show_progress=False,
         trace_execution=trace_execution,
+        use_batcher=False,
+        use_spinlock=use_spinlock,
     )
     for key, bs in vmfbs.items():
         for bs_int, vmfb_list in bs.items():
@@ -184,6 +187,8 @@ class SampleProcessor(Process):
 
         os.environ["ROCR_VISIBLE_DEVICES"] = f"{device_id}"
 
+        self.use_spinlock = bool(os.environ["PYTHON_GIL"])
+
         if isinstance(self.response_comm, multiprocessing.queues.JoinableQueue):
             self.send_response = self.response_comm.put_nowait
         elif isinstance(self.response_comm, mp.connection.Connection):
@@ -256,6 +261,7 @@ class SampleProcessor(Process):
             workers_per_device=self.workers_per_device,
             isolation="per_call",
             amdgpu_async_allocations=True,
+            use_spinlock=self.use_spinlock,
         )
         self.implementation = self.implementation_holder(
             sdxl_service, self.init_noise_latent

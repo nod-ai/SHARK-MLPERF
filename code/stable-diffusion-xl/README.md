@@ -119,19 +119,11 @@ Once you are in this container, run:
 # Offline
 PYTHON_GIL=0 ./run_scenario_offline_MI325x_cpx.sh
 
-# Server
-PYTHON_GIL=0 ./run_scenario_server_MI325x_cpx.sh
+# Server -- Make sure PYTHON_GIL=1 for best performance.
+PYTHON_GIL=1 ./run_scenario_server_MI325x_cpx.sh
 ```
 
-### Troubleshooting
+By default, the scripts will save your submission results to `code/stable-diffusion-xl/SDXL_inference/Submission/...` including accuracy and compliance test results.
 
-When you see error
-```bash
-ValueError: shortfin_iree-src/runtime/src/iree/io/parameter_index.c:237: NOT_FOUND; no parameter found in index with key 'down_blocks.1.attentions.0.transformer_blocks.0.attn1.out_q:rscale'
-```
-Please execute command
-```bash
-rm /models/SDXL/official_pytorch/fp16/stable_diffusion_fp16/genfiles/sdxl/stable_diffusion_xl_base_1_0_punet_dataset_i8.irpa
-```
-Then re-run the harness.py
+The offline scenario uses a large sample count and can take up to 3 hours to complete all scenario tests. Server mode is shorter and should take under 45 minutes.
 

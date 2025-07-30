@@ -76,7 +76,7 @@ ARG APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
 
 ENV UNSAFE_PYO3_BUILD_FREE_THREADED=1
 
-RUN git clone https://github.com/nod-ai/shark-ai.git -b shared/mlperf-v5.1-sdxl-nogil \
+RUN git clone https://github.com/nod-ai/shark-ai.git -b shared/mlperf-v5.1-sdxl-nogil-spin \
     && cd shark-ai \
     && pip install aiohttp==3.9.5 \
     && pip install -r requirements.txt -r requirements-iree-pinned.txt -e sharktank/ -e shortfin/ \
