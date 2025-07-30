@@ -2,7 +2,7 @@
 set -euxo pipefail
 RESULT_DIR="/mlperf/harness/Submission/"
 SCENARIO="Server"
-BATCH_SIZE=1
+BATCH_SIZE=2
 QPS=14.6
 FPD=1
 CPD=2
@@ -22,7 +22,7 @@ function run_scenario {
 	RESULTS_ROOT=${OUTPUT_ROOT}/results/${SYSTEM_CONFIG_ID}/stable-diffusion-xl
 	COMP_ROOT=${OUTPUT_ROOT}/compliance/${SYSTEM_CONFIG_ID}/stable-diffusion-xl
 	echo "Run $SCENARIO performance test"
-	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.11 harness.py \
+	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.13 harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
 		--cores_per_devices $CPD \
@@ -34,12 +34,12 @@ function run_scenario {
   		--vae_batch_size 1 \
 		--enable_batcher True \
 		--td_spec=attention_and_matmul_spec_gfx942_MI325.mlir \
-		--model_json=sdxl_config_fp8_sched_unet_bs1.json 
+		--model_json=sdxl_config_i8_sched_unet_bs$BATCH_SIZE.json 
 
 	echo "Finished performance test."
 	echo "Run $SCENARIO accuracy test"
 
-	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.11 harness.py \
+	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.13 harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
 		--cores_per_devices $CPD \
@@ -50,11 +50,12 @@ function run_scenario {
 		--logfile_outdir ${RESULTS_ROOT}/${SCENARIO}/accuracy \
   		--vae_batch_size 1 \
 		--enable_batcher True \
+		--num_sample_loops 1 \
 		--td_spec=attention_and_matmul_spec_gfx942_MI325.mlir \
-		--model_json=sdxl_config_fp8_sched_unet_bs1.json 
+		--model_json=sdxl_config_i8_sched_unet_bs$BATCH_SIZE.json 
 
 	echo "Finished accuracy test."
-
+	
 	./setup_accuracy_env.sh
 	./check_accuracy_scores.sh ${RESULTS_ROOT}/${SCENARIO}/accuracy/mlperf_log_accuracy.json
 	
@@ -79,7 +80,7 @@ function run_compliance_test {
 
 	copy_audit $TEST
 	echo "Run $SCENARIO $TEST test"
-	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.11 harness.py \
+	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.13 harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
 		--cores_per_devices $CPD \
@@ -91,7 +92,7 @@ function run_compliance_test {
   		--vae_batch_size 1 \
 		--enable_batcher True \
 		--td_spec=attention_and_matmul_spec_gfx942_MI325.mlir \
-		--model_json=sdxl_config_fp8_sched_unet_bs1.json 
+		--model_json=sdxl_config_i8_sched_unet_bs$BATCH_SIZE.json 
 	rm audit.config
 }
 function copy_audit

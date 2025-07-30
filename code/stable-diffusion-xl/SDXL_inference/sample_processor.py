@@ -46,7 +46,7 @@ def create_service(
         show_progress=False,
         trace_execution=trace_execution,
         use_batcher=False,
-       # use_spinlock=use_spinlock,
+        use_spinlock=use_spinlock,
     )
     for key, bs in vmfbs.items():
         for bs_int, vmfb_list in bs.items():
