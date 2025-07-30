@@ -104,16 +104,6 @@ IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_
 
 ## Run scenario and reproduce results
 
-### Server 
-
-While still in the container for precompilation, you may run server mode.
-```bash
-# Server -- Make sure PYTHON_GIL=1 for best performance.
-PYTHON_GIL=1 ./run_scenario_server_MI325x_cpx.sh
-```
-
-### Offline
-
 Now that you have successfully compiled artifacts for running SDXL, you may exit the docker container and run the nogil dockerfile:
 ```bash
 exit
@@ -129,6 +119,8 @@ Once you are in this container, run:
 # Offline
 PYTHON_GIL=0 ./run_scenario_offline_MI325x_cpx.sh
 
+# Server -- Make sure PYTHON_GIL=1 for best performance.
+PYTHON_GIL=1 ./run_scenario_server_MI325x_cpx.sh
 ```
 
 By default, the scripts will save your submission results to `code/stable-diffusion-xl/SDXL_inference/Submission/...` including accuracy and compliance test results.
