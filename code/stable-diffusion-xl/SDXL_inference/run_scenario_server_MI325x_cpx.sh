@@ -3,8 +3,8 @@ set -euxo pipefail
 RESULT_DIR="/mlperf/harness/Submission/"
 SCENARIO="Server"
 BATCH_SIZE=2
-QPS=16.5
-FPD=1
+QPS=16.4
+FPD=2
 CPD=2
 SYSTEM_CONFIG_ID="8xMI325x_2xEPYC-9655"
 
@@ -20,8 +20,8 @@ function run_scenario {
 
 	RESULTS_ROOT=${OUTPUT_ROOT}/results/${SYSTEM_CONFIG_ID}/stable-diffusion-xl
 	COMP_ROOT=${OUTPUT_ROOT}/compliance/${SYSTEM_CONFIG_ID}/stable-diffusion-xl
-	echo "Run $SCENARIO performance test"
-	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.13 harness.py \
+	# echo "Run $SCENARIO performance test"
+	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.11 harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
 		--cores_per_devices $CPD \
@@ -31,15 +31,15 @@ function run_scenario {
 		--test_mode PerformanceOnly \
 		--logfile_outdir ${RESULTS_ROOT}/${SCENARIO}/performance/run_1 \
   		--vae_batch_size 1 \
-		--num_sample_loops 1 \
+		--num_sample_loops 2 \
 		--enable_batcher True \
 		--td_spec=attention_and_matmul_spec_gfx942_MI325.mlir \
 		--model_json=sdxl_config_fp8_sched_unet_bs2.json
 
-	echo "Finished performance test."
-	echo "Run $SCENARIO accuracy test"
+	# echo "Finished performance test."
+	# echo "Run $SCENARIO accuracy test"
 
-	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.13 harness.py \
+	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.11 harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
 		--cores_per_devices $CPD \
@@ -79,7 +79,7 @@ function run_compliance_test {
 
 	copy_audit $TEST
 	echo "Run $SCENARIO $TEST test"
-	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.13 harness.py \
+	ROCR_VISIBLE_DEVICES=$DEVICES HIP_VISIBLE_DEVICES=$DEVICES python3.11 harness.py \
 		--devices "$DEVICES" \
 		--gpu_batch_size $BATCH_SIZE \
 		--cores_per_devices $CPD \
