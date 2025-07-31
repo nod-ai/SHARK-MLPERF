@@ -3,7 +3,7 @@ set -euxo pipefail
 RESULT_DIR="/mlperf/harness/Submission/"
 SCENARIO="Server"
 BATCH_SIZE=2
-QPS=16.5
+QPS=16.2
 FPD=1
 CPD=2
 SYSTEM_CONFIG_ID="8xMI325x_2xEPYC-9655"
@@ -50,6 +50,7 @@ function run_scenario {
 		--enable_batcher True \
 		--logfile_outdir ${RESULTS_ROOT}/${SCENARIO}/accuracy \
   		--vae_batch_size 1 \
+		--num_sample_loops 1 \
 		--td_spec=attention_and_matmul_spec_gfx942_MI325.mlir \
 		--model_json=sdxl_config_fp8_sched_unet_bs2.json 
 
