@@ -90,6 +90,7 @@ function run_compliance_test {
 		--logfile_outdir ${RESULTS_ROOT}/${SCENARIO}/$TEST \
 		--enable_batcher True \
   		--vae_batch_size 1 \
+		--num_sample_loops 1 \
 		--td_spec=attention_and_matmul_spec_gfx942_MI325.mlir \
 		--model_json=sdxl_config_fp8_sched_unet_bs2.json 
 	rm audit.config
