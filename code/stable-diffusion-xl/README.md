@@ -30,7 +30,7 @@ sudo rocm-smi --setcomputepartition CPX
 
 Clone this repository with the staging-v5.1 branch:
 ```bash
-git clone https://github.com/nod-ai/SHARK-MLPERF -b staging-v5.1
+git clone https://github.com/nod-ai/SHARK-MLPERF -b dev
 ```
 
 ### Quantization
