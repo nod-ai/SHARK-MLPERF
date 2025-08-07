@@ -35,19 +35,33 @@ def create_service(
     amdgpu_async_allocations=True,
     use_spinlock=False,
 ):
-    sdxl_service = GenerateService(
-        name="sd",
-        sysman=sysman,
-        tokenizers=tokenizers,
-        model_params=model_params,
-        fibers_per_device=fibers_per_device,
-        workers_per_device=workers_per_device,
-        prog_isolation=isolation,
-        show_progress=False,
-        trace_execution=trace_execution,
-        use_batcher=False,
-        use_spinlock=use_spinlock,
-    )
+    if use_spinlock:
+        sdxl_service = GenerateService(
+            name="sd",
+            sysman=sysman,
+            tokenizers=tokenizers,
+            model_params=model_params,
+            fibers_per_device=fibers_per_device,
+            workers_per_device=workers_per_device,
+            prog_isolation=isolation,
+            show_progress=False,
+            trace_execution=trace_execution,
+            use_batcher=False,
+            use_spinlock=use_spinlock,
+        )
+    else:
+        sdxl_service = GenerateService(
+            name="sd",
+            sysman=sysman,
+            tokenizers=tokenizers,
+            model_params=model_params,
+            fibers_per_device=fibers_per_device,
+            workers_per_device=workers_per_device,
+            prog_isolation=isolation,
+            show_progress=False,
+            trace_execution=trace_execution,
+            use_batcher=False,
+        )
     for key, bs in vmfbs.items():
         for bs_int, vmfb_list in bs.items():
             for vmfb in vmfb_list:
@@ -187,7 +201,7 @@ class SampleProcessor(Process):
 
         os.environ["ROCR_VISIBLE_DEVICES"] = f"{device_id}"
 
-        self.use_spinlock = False if os.environ["PYTHON_GIL"] == 0 else True
+        self.use_spinlock = False
 
         if isinstance(self.response_comm, multiprocessing.queues.JoinableQueue):
             self.send_response = self.response_comm.put_nowait

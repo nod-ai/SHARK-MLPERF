@@ -48,7 +48,7 @@ RUN git clone https://github.com/iree-org/iree.git -b shared/mlperf-v5.1-sdxl  \
 RUN cd iree && python3.11 -m pip install --force-reinstall -r runtime/bindings/python/iree/runtime/build_requirements.txt && \
   python3.11 -m pip uninstall -y numpy && \
   python3.11 -m pip install numpy==1.* && \
-  cmake -S . -B build-release \
+  cmake -S . -B build-offline \
   -G Ninja -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_C_COMPILER=`which clang` -DCMAKE_CXX_COMPILER=`which clang++` \
   -DIREE_HAL_DRIVER_CUDA=OFF \
@@ -56,12 +56,26 @@ RUN cd iree && python3.11 -m pip install --force-reinstall -r runtime/bindings/p
   -DPython3_EXECUTABLE="$(which python3.11)" \
   -DIREE_TARGET_BACKEND_ROCM=ON \
   -DIREE_HAL_DRIVER_HIP=ON && \
-  cmake --build build-release/ --target tools/all && \
-  cmake --build build-release/ --target install
+  cmake --build build-offline/
+
+RUN cd iree && git checkout shared/mlperf-v5.0-sdxl && git submodule update
+
+RUN cd iree && python3.11 -m pip install --force-reinstall -r runtime/bindings/python/iree/runtime/build_requirements.txt && \
+  python3.11 -m pip uninstall -y numpy && \
+  python3.11 -m pip install numpy==1.* && \
+  cmake -S . -B build-server \
+  -G Ninja -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_C_COMPILER=`which clang` -DCMAKE_CXX_COMPILER=`which clang++` \
+  -DIREE_HAL_DRIVER_CUDA=OFF \
+  -DIREE_BUILD_PYTHON_BINDINGS=ON \
+  -DPython3_EXECUTABLE="$(which python3.11)" \
+  -DIREE_TARGET_BACKEND_ROCM=ON \
+  -DIREE_HAL_DRIVER_HIP=ON && \
+  cmake --build build-server/
 
 # Make IREE tools discoverable in PATH
-ENV PATH=/iree/build-release/tools:$PATH
-ENV PYTHONPATH=/iree/build-release/runtime/bindings/python:/iree/build-release/compiler/bindings/python
+ENV PATH=/iree/build-offline/tools:$PATH
+ENV PYTHONPATH=/iree/build-offline/runtime/bindings/python:/iree/build-offline/compiler/bindings/python
 
 ######################################################
 # Install shark-ai

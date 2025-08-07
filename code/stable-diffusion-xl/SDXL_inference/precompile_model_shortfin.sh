@@ -49,6 +49,7 @@ if [[ -n "$td_spec" ]]; then
 fi
 shortfin_dir="/shark-ai/shortfin/python/shortfin_apps/sd"
 export IREE_BUILD_MP_CONTEXT="fork"
+export PYTHONPATH="$IREE_BUILD_DIR/runtime/bindings/python:$IREE_BUILD_DIR/compiler/bindings/python"
 
 # Modify JSON batch sizes
 sed -i -E "s/\"clip\": \[[0-9]+\]/\"clip\": [$gpu_batch_size]/g; \
