@@ -5,7 +5,7 @@ shopt -s expand_aliases
 RESULT_DIR="/mlperf/harness/Submission/"
 SCENARIO="Offline"
 BATCH_SIZE=32
-COUNT=107400
+COUNT=2000
 QPS=17
 FPD=1
 CPD=1
