@@ -17,8 +17,6 @@ jobs:
     steps:
       - name: Increase system vm map
         run: sudo sysctl -w vm.max_map_count=262144
-      - name: Set compute partitioning
-        run: sudo rocm-smi --setcomputepartition CPX
       - name: Increase static TLS block limit
         run: export GLIBC_TUNABLES=glibc.rtld.optional_static_tls=2048
       - name: Checking out this repo
@@ -60,7 +58,11 @@ jobs:
     needs: start_container
     name: "ML Perf Harness Test"
     runs-on: nod-mi325-8gpu-mlperf
-    steps:
+    steps:      
+      - name: Set compute partitioning
+        run: docker exec ci_container_micro_shortfin_${{ github.run_number }} sudo modprobe -r ast && sudo modprobe amdgpu ip_block_mask=0x7f && sudo sh -c 'echo 0 > /proc/sys/kernel/numa_balancing' && sudo rocm-smi --setcomputepartition CPX
+      - name: Set compute partitioning (offline)
+        run: docker exec ci_container_micro_shortfin_nogil_${{ github.run_number }} sudo modprobe -r ast && sudo modprobe amdgpu ip_block_mask=0x7f && sudo sh -c 'echo 0 > /proc/sys/kernel/numa_balancing' && sudo rocm-smi --setcomputepartition CPX
       - name: Print Hashes of Dependencies
         run: |
           docker exec ci_container_micro_shortfin_nogil_${{ github.run_number }} ./get_hashes.sh
