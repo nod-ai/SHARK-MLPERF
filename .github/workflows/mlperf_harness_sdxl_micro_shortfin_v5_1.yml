@@ -28,13 +28,13 @@ jobs:
       - name: Build and run Docker
         run: |
           cd code/stable-diffusion-xl/
-          docker build --no-cache --platform linux/amd64 \
+          sudo docker build --no-cache --platform linux/amd64 \
             --tag mlperf_rocm_sdxl:ci_micro_shortfin_nogil_${{ github.run_number }} \
             --file SDXL_inference/sdxl_harness_rocm_shortfin_no_gil.dockerfile .
-          docker build --no-cache --platform linux/amd64 \
+          sudo docker build --no-cache --platform linux/amd64 \
             --tag mlperf_rocm_sdxl:ci_micro_shortfin_${{ github.run_number }} \
             --file SDXL_inference/sdxl_harness_rocm_shortfin_from_source_iree.dockerfile .
-          docker run -dt --network=host --device=/dev/kfd --device=/dev/dri \
+          sudo docker run -dt --network=host --device=/dev/kfd --device=/dev/dri \
             --group-add video --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
             -v /data/mlperf_sdxl/data:/data \
             -v /data/mlperf_sdxl/models:/models \
@@ -44,7 +44,7 @@ jobs:
             -w /mlperf/harness \
             --name ci_container_micro_shortfin_nogil_${{ github.run_number }} \
             mlperf_rocm_sdxl:ci_micro_shortfin_nogil_${{ github.run_number }}
-          docker run -dt --network=host --device=/dev/kfd --device=/dev/dri \
+          sudo docker run -dt --network=host --device=/dev/kfd --device=/dev/dri \
             --group-add video --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
             -v /data/mlperf_sdxl/data:/data \
             -v /data/mlperf_sdxl/models:/models \
@@ -60,25 +60,25 @@ jobs:
     runs-on: nod-mi325-8gpu-mlperf
     steps:      
       - name: Set compute partitioning
-        run: docker exec ci_container_micro_shortfin_${{ github.run_number }} sudo modprobe -r ast && sudo modprobe amdgpu ip_block_mask=0x7f && sudo sh -c 'echo 0 > /proc/sys/kernel/numa_balancing' && sudo rocm-smi --setcomputepartition CPX
+        run: sudo docker exec ci_container_micro_shortfin_${{ github.run_number }} sudo modprobe -r ast && sudo modprobe amdgpu ip_block_mask=0x7f && sudo sh -c 'echo 0 > /proc/sys/kernel/numa_balancing' && sudo rocm-smi --setcomputepartition CPX
       - name: Set compute partitioning (offline)
-        run: docker exec ci_container_micro_shortfin_nogil_${{ github.run_number }} sudo modprobe -r ast && sudo modprobe amdgpu ip_block_mask=0x7f && sudo sh -c 'echo 0 > /proc/sys/kernel/numa_balancing' && sudo rocm-smi --setcomputepartition CPX
+        run: sudo docker exec ci_container_micro_shortfin_nogil_${{ github.run_number }} sudo modprobe -r ast && sudo modprobe amdgpu ip_block_mask=0x7f && sudo sh -c 'echo 0 > /proc/sys/kernel/numa_balancing' && sudo rocm-smi --setcomputepartition CPX
       - name: Print Hashes of Dependencies
         run: |
-          docker exec ci_container_micro_shortfin_nogil_${{ github.run_number }} ./get_hashes.sh
+          sudo docker exec ci_container_micro_shortfin_nogil_${{ github.run_number }} ./get_hashes.sh
           cat SDXL_inference/hashes.txt
       - name: Precompile (Server)
         run: |
-          docker exec ci_container_micro_shortfin_${{ github.run_number }} IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_bs2.json --force_export True
+          sudo docker exec ci_container_micro_shortfin_${{ github.run_number }} IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325.mlir --model_json sdxl_config_fp8_sched_unet_bs2.json --force_export True
       - name: Precompile (Offline)
         run: |
-          docker exec ci_container_micro_shortfin_${{ github.run_number }} IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325_bs32.mlir --model_json sdxl_config_fp8_sched_unet_bs32.json --force_export True
+          sudo docker exec ci_container_micro_shortfin_${{ github.run_number }} IREE_BUILD_MP_CONTEXT="fork" ./precompile_model_shortfin.sh --td_spec attention_and_matmul_spec_gfx942_MI325_bs32.mlir --model_json sdxl_config_fp8_sched_unet_bs32.json --force_export True
       - name: Run Server
         run: |
-          docker exec ci_container_micro_shortfin_${{ github.run_number }} ./run_scenario_server_MI325x_cpx.sh
+          sudo docker exec ci_container_micro_shortfin_${{ github.run_number }} ./run_scenario_server_MI325x_cpx.sh
       - name: Run Offline
         run: |
-          docker exec ci_container_micro_shortfin_nogil_${{ github.run_number }} PYTHON_GIL=0 ./run_scenario_offline_MI325x_cpx_c2000.sh
+          sudo docker exec ci_container_micro_shortfin_nogil_${{ github.run_number }} PYTHON_GIL=0 ./run_scenario_offline_MI325x_cpx_c2000.sh
       - name: "Upload accuracy artifact (offline)"
         uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
@@ -108,12 +108,12 @@ jobs:
     steps:
       - name: Cleanup Docker
         run: |
-          docker stop ci_container_micro_shortfin_nogil_${{ github.run_number }}
-          docker stop ci_container_micro_shortfin_${{ github.run_number }}
-          docker rm ci_container_micro_shortfin_nogil_${{ github.run_number }}
-          docker rm ci_container_micro_shortfin_${{ github.run_number }}
-          docker rmi mlperf_rocm_sdxl:ci_micro_shortfin_nogil_${{ github.run_number }}
-          docker rmi mlperf_rocm_sdxl:ci_micro_shortfin_${{ github.run_number }}
+          sudo docker stop ci_container_micro_shortfin_nogil_${{ github.run_number }}
+          sudo docker stop ci_container_micro_shortfin_${{ github.run_number }}
+          sudo docker rm ci_container_micro_shortfin_nogil_${{ github.run_number }}
+          sudo docker rm ci_container_micro_shortfin_${{ github.run_number }}
+          sudo docker rmi mlperf_rocm_sdxl:ci_micro_shortfin_nogil_${{ github.run_number }}
+          sudo docker rmi mlperf_rocm_sdxl:ci_micro_shortfin_${{ github.run_number }}
       - name: Cleanup Submission artifacts
         run: |
           sudo rm -r ./code/stable-diffusion-xl/SDXL_inference/Submission
