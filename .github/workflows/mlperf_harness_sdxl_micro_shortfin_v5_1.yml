@@ -11,7 +11,7 @@ on:
   schedule:
     - cron: '0 0 * * 0'
 jobs:
-  start_container:
+  build_container:
     name: "Build Container"
     runs-on: nod-mi325-8gpu-mlperf
     steps:
@@ -36,6 +36,7 @@ jobs:
             --file SDXL_inference/sdxl_harness_rocm_shortfin_from_source_iree.dockerfile .
   run_container:
     name: "Run Container"
+    needs: build_container
     runs-on: nod-mi325-8gpu-mlperf
     steps:
       - name: Build Docker
@@ -62,7 +63,7 @@ jobs:
             --name ci_container_micro_shortfin_${{ github.run_number }} \
             mlperf_rocm_sdxl:ci_micro_shortfin_${{ github.run_number }}
   ml_perf_test:
-    needs: start_container
+    needs: run_container
     name: "ML Perf Harness Test"
     runs-on: nod-mi325-8gpu-mlperf
     steps:
