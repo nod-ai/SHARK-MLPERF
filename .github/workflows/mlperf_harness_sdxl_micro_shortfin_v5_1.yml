@@ -12,7 +12,7 @@ on:
     - cron: '0 0 * * 0'
 jobs:
   start_container:
-    name: "Start Container"
+    name: "Build Container"
     runs-on: nod-mi325-8gpu-mlperf
     steps:
       - name: Increase system vm map
@@ -25,7 +25,7 @@ jobs:
           ref: v5.1
       # -dt lets us run in an interactive, but detached mode which keeps the container alive
       # so the actual testing job can use it using docker exec
-      - name: Build and run Docker
+      - name: Build Docker
         run: |
           cd code/stable-diffusion-xl/
           sudo docker build --no-cache --platform linux/amd64 \
@@ -34,6 +34,13 @@ jobs:
           sudo docker build --no-cache --platform linux/amd64 \
             --tag mlperf_rocm_sdxl:ci_micro_shortfin_${{ github.run_number }} \
             --file SDXL_inference/sdxl_harness_rocm_shortfin_from_source_iree.dockerfile .
+  run_container:
+    name: "Run Container"
+    runs-on: nod-mi325-8gpu-mlperf
+    steps:
+      - name: Build Docker
+        run: |
+          cd code/stable-diffusion-xl/
           sudo docker run -dt --network=host --device=/dev/kfd --device=/dev/dri \
             --group-add video --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
             -v /data/mlperf_sdxl/data:/data \
@@ -45,7 +52,7 @@ jobs:
             --name ci_container_micro_shortfin_nogil_${{ github.run_number }} \
             mlperf_rocm_sdxl:ci_micro_shortfin_nogil_${{ github.run_number }}
           sudo docker run -dt --network=host --device=/dev/kfd --device=/dev/dri \
-            --group-add video --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
+            --group-add video,render --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
             -v /data/mlperf_sdxl/data:/data \
             -v /data/mlperf_sdxl/models:/models \
             -v `pwd`/SDXL_inference/:/mlperf/harness \
@@ -58,11 +65,7 @@ jobs:
     needs: start_container
     name: "ML Perf Harness Test"
     runs-on: nod-mi325-8gpu-mlperf
-    steps:      
-      - name: Set compute partitioning
-        run: sudo docker exec ci_container_micro_shortfin_${{ github.run_number }} sudo modprobe -r ast && sudo modprobe amdgpu ip_block_mask=0x7f && sudo sh -c 'echo 0 > /proc/sys/kernel/numa_balancing' && sudo rocm-smi --setcomputepartition CPX
-      - name: Set compute partitioning (offline)
-        run: sudo docker exec ci_container_micro_shortfin_nogil_${{ github.run_number }} sudo modprobe -r ast && sudo modprobe amdgpu ip_block_mask=0x7f && sudo sh -c 'echo 0 > /proc/sys/kernel/numa_balancing' && sudo rocm-smi --setcomputepartition CPX
+    steps:
       - name: Print Hashes of Dependencies
         run: |
           sudo docker exec ci_container_micro_shortfin_nogil_${{ github.run_number }} ./get_hashes.sh
